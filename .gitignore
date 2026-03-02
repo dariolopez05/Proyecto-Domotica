@@ -20,3 +20,6 @@ datasets/raw/**
 artifacts/models/**
 !artifacts/models/.gitkeep
 
+# SQL (ignorar todo lo de dentro de /sql)
+sql/**
+
