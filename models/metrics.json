@@ -1,0 +1,12 @@
+{
+  "baseline_ml": {
+    "metric_name": "rmse",
+    "value": null
+  },
+  "nn": {
+    "metric_name": "rmse",
+    "value": null
+  },
+  "notes": "Rellena este archivo con las métricas finales (y/o por split)."
+}
+

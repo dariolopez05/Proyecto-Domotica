@@ -1,0 +1,7 @@
+# Normaliza finales de línea
+* text=auto
+
+# Mantén SQL y MD como texto
+*.sql text
+*.md text
+

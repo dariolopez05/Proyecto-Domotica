@@ -1,0 +1,22 @@
+# Sistema / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+
+# Python (si aplica)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Datos
+datasets/raw/**
+!datasets/raw/.gitkeep
+
+# Artefactos generados localmente (ajusta según necesidades)
+artifacts/models/**
+!artifacts/models/.gitkeep
+
