@@ -2,7 +2,6 @@
 "2025-01-28 17:02:21.323756+01","binary_sensor.sensor_puerta_1_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_puerta_1 Puerta""}"
 "2026-02-20 07:45:06.588227+01","binary_sensor.sensor_ventana_1_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_1 Puerta""}"
 "2026-02-12 08:18:24.431267+01","binary_sensor.sensor_ventana_10_contact","unavailable","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_10 Puerta""}"
-"2025-01-22 20:50:44.612604+01","binary_sensor.sensor_ventana_11_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_11 Puerta""}"
 "2025-10-02 21:00:00.127888+02","binary_sensor.sensor_ventana_12_contact","unavailable","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_12 Puerta""}"
 "2025-04-11 20:59:57.247602+02","binary_sensor.sensor_ventana_2_contact","unavailable","{""device_class"": ""door"", ""friendly_name"": "" sensor_ventana_2 Puerta""}"
 "2025-06-03 08:08:07.211855+02","binary_sensor.sensor_ventana_3_contact","unavailable","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_3 Puerta""}"

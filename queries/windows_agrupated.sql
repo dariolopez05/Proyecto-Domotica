@@ -15,9 +15,6 @@ WITH eventos AS (
     FROM ltss
     WHERE entity_id IN (
         'binary_sensor.sensor_ventana_1_contact',
-        'binary_sensor.sensor_ventana_10_contact',
-        'binary_sensor.sensor_ventana_11_contact',
-        'binary_sensor.sensor_ventana_12_contact',
         'binary_sensor.sensor_ventana_2_contact',
         'binary_sensor.sensor_ventana_3_contact',
         'binary_sensor.sensor_ventana_4_contact',
@@ -25,7 +22,9 @@ WITH eventos AS (
         'binary_sensor.sensor_ventana_6_contact',
         'binary_sensor.sensor_ventana_7_contact',
         'binary_sensor.sensor_ventana_8_contact',
-        'binary_sensor.sensor_ventana_9_contact'
+        'binary_sensor.sensor_ventana_9_contact',
+        'binary_sensor.sensor_ventana_10_contact',
+        'binary_sensor.sensor_ventana_12_contact'
     )
     AND state <> 'unavailable'
 ),
