@@ -23,3 +23,5 @@ artifacts/models/**
 # SQL (ignorar todo lo de dentro de /sql)
 sql/**
 
+# Carpeta de pruebas
+pruebas/

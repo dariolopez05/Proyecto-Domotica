@@ -2,6 +2,22 @@
 
 Estructura base para un proyecto de ingesta, limpieza, feature engineering, modelado y reporting.
 
+## Objetivos
+
+¿Qué problema vais a resolver?
+- El problema a resolver es el derroche energético en calefacción en el centro educativo por culpa de ventanas/puertas abiertas mientras la calefacción está encendida
+
+¿Qué queréis predecir o detectar?
+- El objetivo es usar los datos de temperatura que recogemos a lo largo de una hora para predecir si en la siguiente hora las ventanas van a ser abiertas o no
+
+¿Cuál será el target del modelo?
+
+# Indicaciones adicionales
+
+- Los sensores de temperatura de las ventanas no hay que usarlos
+- Hay que estudiar la correlacion entre los sensores para decidir con cual nos quedamos
+- El csv con temperaturas mide las de un aula distinta a la nuestra en la misma orientación
+
 ## Estructura
 
 ```text
@@ -53,4 +69,3 @@ Domotica/
 
 - Si vas a versionar datos, hazlo solo en `datasets/cleaned` o `datasets/curated` y siempre sin información sensible.
 - Los binarios pesados (PBIX, PDFs, modelos) pueden mantenerse en el repo si el tamaño lo permite, o gestionarse con releases/almacenamiento externo.
-
