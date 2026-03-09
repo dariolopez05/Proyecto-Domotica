@@ -1,0 +1,1 @@
+SELECT * FROM ltss WHERE time IN(SELECT min(time) FROM ltss group by entity_id)
