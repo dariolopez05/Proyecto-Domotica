@@ -67,7 +67,7 @@ Domotica/
 # Indicaciones adicionales
 
 - Los sensores de temperatura de las ventanas no hay que usarlos
-- Hay que estudiar la correlacion entre los sensores para decidir con cual nos quedamos o si hacemos una media de todo
+- Buscar el coeficiente de correlacion entre los 4 sensores de temperatura internos para decidir con cual nos quedamos
 - El csv con temperaturas mide las de un aula distinta a la nuestra en la misma ala del instituto
 - Vamos a eliminar el sensor de la ventana 11 ya que dejó de funcionar en octubre de 2025 y proporciona lectura erroneas a partir de ese momento
 - Las ventanas pares son las pequeñas (superiores), las grandes son las impares (inferiores) y vamos a tener en cuenta que cada ventana pequeña cuenta como 1 (unidad de medida mínima) con lo cual cada ventana grande cuenta como 2
@@ -79,3 +79,4 @@ Domotica/
 - Consulta SQL para extracción de atributos de la columna en formato Json (friendly_name, device_class y unit_of_measurement)
 - Desarrollo de una consulta SQL para filtrar y agrupar por hora las entidades cuyo estado es cerrado (off) o abierto (on) sumando el tiempo total de apertura por hora, y después agrupando las entidades con una funcion ventana para obtener una suma del tiempo de apertura conjunto de todas las ventanas
 - Desarrollo de una consulta SQL para filtrar y agrupar por hora las temperaturas de los sensores haciendo una media de sus valores
+- Desarrollar un modelo de regresion lineal para predecir la temperatura de la calefacción (que decide si está encendida o no) para averiguar según el algoritmo de encendido/apagado el estado actual de la calefacción
