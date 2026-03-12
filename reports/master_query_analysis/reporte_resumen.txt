@@ -1,0 +1,79 @@
+
+╔════════════════════════════════════════════════════════════════╗
+║           REPORTE DE ANÁLISIS - MASTER QUERY                  ║
+╚════════════════════════════════════════════════════════════════╝
+
+1. INFORMACIÓN GENERAL
+═══════════════════════════════════════════════════════════════
+Total de registros: 9,261
+Período: 2024-12-18 16:00 a 2026-03-02 08:00
+Duración: 438 días
+
+2. CALIDAD DE DATOS
+═══════════════════════════════════════════════════════════════
+Registros sin valores faltantes: 4,173 (45.1%)
+Registros con valores faltantes: 5,088 (54.9%)
+
+Valores faltantes por columna:
+  - temperatura_exterior: 539 (5.8%)
+  - humedad_exterior: 1285 (13.9%)
+  - presion: 898 (9.7%)
+  - nubosidad: 2766 (29.9%)
+  - viento: 861 (9.3%)
+  - direccion_viento: 168 (1.8%)
+  - temperatura_aula: 840 (9.1%)
+  - humedad_aula: 747 (8.1%)
+  - forecast: 122 (1.3%)
+
+
+3. VARIABLES NUMÉRICAS
+═══════════════════════════════════════════════════════════════
+
+  hora:
+    Mín:  0.00
+    Máx:  23.00
+    Media: 11.50
+    Desv.Est: 6.93
+
+  temperatura_exterior:
+    Mín:  -0.30
+    Máx:  39.20
+    Media: 16.42
+    Desv.Est: 6.58
+
+  humedad_exterior:
+    Mín:  12.00
+    Máx:  98.00
+    Media: 65.60
+    Desv.Est: 17.80
+
+  presion:
+    Mín:  989.50
+    Máx:  1033.90
+    Media: 1016.49
+    Desv.Est: 6.87
+
+  nubosidad:
+    Mín:  0.00
+    Máx:  100.00
+    Media: 47.66
+    Desv.Est: 37.35
+
+
+4. ANÁLISIS GENERADOS (VERSIÓN SIMPLIFICADA)
+═══════════════════════════════════════════════════════════════
+✓ estadisticas_basicas.csv
+✓ informacion_dataset.txt
+✓ matriz_correlaciones.csv
+✓ correlaciones_heatmap.png
+✓ distribuciones.png
+✓ series_temporales.png
+✓ analisis_por_mes.png
+✓ estadisticas_por_mes.csv
+✓ reporte_resumen.txt
+
+NOTA: Se analiza solo por mes porque es el análisis temporal más relevante.
+Los análisis por hora y día de semana no incluyen el contexto temporal
+suficiente (varían según la época del año y el día específico).
+
+Todos los archivos se encuentran en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\reports\master_query_analysis

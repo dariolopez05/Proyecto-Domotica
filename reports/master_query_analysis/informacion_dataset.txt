@@ -1,0 +1,29 @@
+
+INFORMACIÓN DEL DATASET
+=======================
+Total de filas: 9261
+Período: 2024-12-18 16:00:00 a 2026-03-02 08:00:00
+Rango de tiempo: 438 días
+
+COLUMNAS POR TIPO:
+- Fechas/Tiempo: datetime, dia_semana, mes, hora
+- Numéricas: 11 columnas
+- Categóricas: dia_semana, mes, forecast
+
+VALORES FALTANTES:
+datetime                   0
+dia_semana                 0
+mes                        0
+hora                       0
+temperatura_exterior     539
+humedad_exterior        1285
+presion                  898
+nubosidad               2766
+viento                   861
+direccion_viento         168
+azimuth_sol                0
+elevacion_sol              0
+temperatura_aula         840
+humedad_aula             747
+forecast                 122
+dtype: int64
