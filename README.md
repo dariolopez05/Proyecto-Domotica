@@ -92,6 +92,17 @@ Domotica/
 ### Regresión de Temperatura
 - Desarrollar un modelo de regresion lineal para predecir la temperatura de la calefacción (que decide si está encendida o no) para averiguar según el algoritmo de encendido/apagado el estado actual de la calefacción
 
+### Sensores/Agrupaciones
+temperatura-media
+humedad-media
+nubosidad-media
+presión-media
+viento-moda
+dirección viento-moda
+azimuth solar-mediana
+elevación solar-mediana
+forecast-último valor
+
 # To-Do list
 - Refactor del script de correlacion de sensores para automatizar la creacion de csv mediante consulta sql "media_temperature"
 - Explorar métodos de automatización de limpieza de datos con python, posible cambio a python o integración con los sql existentes
