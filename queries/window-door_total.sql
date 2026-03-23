@@ -63,7 +63,7 @@ duracion_hora AS (
         attributes,
 
         CASE
-            WHEN entity_id = 'binary_sensor.sensor_puerta_1_contact' THEN 2
+            WHEN entity_id = 'binary_sensor.sensor_puerta_1_contact' THEN 4
             WHEN (substring(entity_id from 'ventana_([0-9]+)')::int % 2) <> 0 THEN 2
             ELSE 1
         END AS peso,
@@ -91,7 +91,7 @@ SELECT
         AS total_ventilacion_ponderada_hora,
 
     ROUND(
-        (SUM(SUM(segundos_abierto * peso)) OVER (PARTITION BY hora) / (18.0 * 3600.0)) * 100,
+        (SUM(SUM(segundos_abierto * peso)) OVER (PARTITION BY hora) / (20.0 * 3600.0)) * 100,
         2
     ) AS porcentaje_ventilacion_aula
 
