@@ -1,0 +1,11 @@
+BACKTEST FUERA DE MUESTRA (TEMPORAL HOLDOUT)
+Este reporte es el valido para detectar sobreajuste y leakage.
+Filas evaluadas (test): 921
+Modelo evaluado: random_forest
+
+- MAE: 1.4070
+- RMSE: 1.7614
+- R2: -0.3591
+- MAPE: 6.70%
+- Bias medio (pred-real): 0.8522
+- Correlacion Pearson: 0.4863

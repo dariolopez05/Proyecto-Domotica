@@ -1,0 +1,13 @@
+CONTRASTE GLOBAL REAL VS PREDICHA (INFORMATIVO)
+Nota: este contraste puede ser optimista.
+Filas evaluadas: 4325
+Modelo usado para prediccion final: random_forest
+
+- MAE: 0.4325
+- RMSE: 0.8472
+- R2: 0.9484
+- MAPE: 2.04%
+- Bias medio (pred-real): 0.1797
+- Correlacion Pearson: 0.9750
+
+Fuente de predicciones: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\data\gold\history_temperature_predictions.csv

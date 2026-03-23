@@ -1,0 +1,26 @@
+MODELO: RandomForestRegressor
+Filas training: 3460
+Filas test: 865
+Variables usadas: hour, month, hour_sin, hour_cos, month_sin, month_cos, humidity_history, hum_lag_1h, hum_lag_24h, temperatura_exterior, humedad_exterior, presion, nubosidad, viento, direccion_viento, azimuth_sol, elevacion_sol, humedad_aula, dia_semana, mes, forecast
+
+METRICAS (validacion temporal 80/20):
+- MAE: 1.4861
+- RMSE: 1.8163
+- R2: -0.5809
+
+BASELINE CONSTANTE (media de train):
+- MAE baseline: 1.4698
+- RMSE baseline: 1.8842
+- R2 baseline: -0.7014
+
+MEJORA VS BASELINE:
+- Mejora MAE: -1.11%
+- Mejora RMSE: 3.61%
+
+Modelo seleccionado para produccion: random_forest
+
+Predicciones guardadas en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\data\gold\history_temperature_predictions.csv
+Modelo guardado en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\models\history_temperature_model_v2.joblib
+Reporte de contraste guardado en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\reports\history_temperature_contraste_real_vs_pred.txt
+Reporte de backtest guardado en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\reports\history_temperature_backtest_metrics.txt
+Grafica de backtest guardada en: C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\reports\history_temperature_backtest_real_vs_pred.png
