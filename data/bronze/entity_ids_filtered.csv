@@ -11,7 +11,7 @@
 "2025-12-01 14:27:24.853252+01","binary_sensor.sensor_ventana_7_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_7 Puerta""}"
 "2025-06-19 21:01:29.385324+02","binary_sensor.sensor_ventana_8_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_8 Puerta""}"
 "2025-06-13 11:16:14.216594+02","binary_sensor.sensor_ventana_9_contact","off","{""device_class"": ""door"", ""friendly_name"": ""sensor_ventana_9 Puerta""}"
-"2026-02-21 02:39:13.838176+01","sensor.mislata_direcc ion_viento","303.3","{""state_class"": ""measurement"", ""friendly_name"": ""mislata_direccion_viento""}"
+"2026-02-21 02:39:13.838176+01","sensor.mislata_direccion_viento","303.3","{""state_class"": ""measurement"", ""friendly_name"": ""mislata_direccion_viento""}"
 "2026-01-09 01:37:21.086492+01","sensor.mislata_humedad","68","{""state_class"": ""measurement"", ""device_class"": ""humidity"", ""friendly_name"": ""mislata_humedad"", ""unit_of_measurement"": ""%""}"
 "2026-01-31 16:37:39.841521+01","sensor.mislata_nubosidad","5.5","{""state_class"": ""measurement"", ""friendly_name"": ""mislata_nubosidad"", ""unit_of_measurement"": ""%""}"
 "2025-06-12 10:57:14.253693+02","sensor.mislata_presion","1013.5","{""state_class"": ""measurement"", ""device_class"": ""atmospheric_pressure"", ""friendly_name"": ""mislata_presion"", ""unit_of_measurement"": ""hPa""}"
