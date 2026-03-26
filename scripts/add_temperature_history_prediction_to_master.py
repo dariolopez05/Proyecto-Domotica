@@ -99,7 +99,7 @@ duracion_hora AS (
 )
 SELECT
     hora,
-    SUM(segundos_abierto * peso) AS total_ventilacion_ponderada_hora,
+    ROUND(SUM(segundos_abierto * peso) / 60.0, 2) AS total_ventilacion_ponderada_min,
     ROUND(
         (SUM(segundos_abierto * peso) / (20.0 * 3600.0)) * 100,
         2
@@ -122,7 +122,7 @@ def fetch_ventilation_percent() -> pd.DataFrame:
     """
     Devuelve un dataframe con columnas:
       - datetime (por hora)
-      - total_ventilacion_ponderada_hora (segundos ponderados)
+      - total_ventilacion_ponderada_min (minutos ponderados)
       - porcentaje_ventilacion_aula
     """
     _load_dotenv_if_present()
@@ -155,15 +155,21 @@ def fetch_ventilation_percent() -> pd.DataFrame:
     else:
         df["datetime"] = df["datetime"]
 
+    df["total_ventilacion_ponderada_min"] = pd.to_numeric(
+        df.get("total_ventilacion_ponderada_min"), errors="coerce"
+    )
     df["porcentaje_ventilacion_aula"] = pd.to_numeric(
         df.get("porcentaje_ventilacion_aula"), errors="coerce"
     )
-    df["total_ventilacion_ponderada_hora"] = pd.to_numeric(
-        df.get("total_ventilacion_ponderada_hora"), errors="coerce"
-    )
+    # Columna numérica para modelado/orden correcto.
+    df["total_ventilacion_ponderada_min"] = df["total_ventilacion_ponderada_min"].round(2)
 
     return df[
-        ["datetime", "total_ventilacion_ponderada_hora", "porcentaje_ventilacion_aula"]
+        [
+            "datetime",
+            "total_ventilacion_ponderada_min",
+            "porcentaje_ventilacion_aula",
+        ]
     ].dropna(subset=["datetime"])
 
 
@@ -317,6 +323,14 @@ def main() -> None:
     if args.add_ventilation:
         vent = fetch_ventilation_percent()
         master_with_pred = master_with_pred.merge(vent, on="datetime", how="left")
+        # Forzamos tipo numérico para evitar orden lexicográfico en visores CSV.
+        master_with_pred["total_ventilacion_ponderada_min"] = pd.to_numeric(
+            master_with_pred["total_ventilacion_ponderada_min"], errors="coerce"
+        ).fillna(0.0).round(2)
+        if "porcentaje_ventilacion_aula" in master_with_pred.columns:
+            master_with_pred["porcentaje_ventilacion_aula"] = pd.to_numeric(
+                master_with_pred["porcentaje_ventilacion_aula"], errors="coerce"
+            ).fillna(0.0).round(2)
 
     master_with_pred.to_csv(OUT_FILE, index=False)
 
