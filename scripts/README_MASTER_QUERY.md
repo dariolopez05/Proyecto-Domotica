@@ -1,12 +1,16 @@
-# Scripts para Ejecutar Master Query
+# Scripts del Pipeline (Medallion)
 
-Este directorio contiene scripts para ejecutar la consulta `master_query.sql` y guardar el resultado en CSV en la carpeta `data/gold`.
+Este directorio contiene el flujo operativo unificado del proyecto.
 
-## Archivos
+## Scripts activos (responsabilidad única)
 
-- **`run_master_query.py`**: Script Python principal que ejecuta la consulta
-- **`run_master_query.ps1`**: Script PowerShell para facilitar la ejecución en Windows
-- **`execute_master_query.py`**: Versión alternativa con más opciones de configuración
+- **`build_gold_dataset.py`**: construye `data/gold/master_dataset.csv` desde `queries/master_query.sql` (fuente única).
+- **`train_linear_heating_model.py`**: entrena regresión lineal e inyecta `temp_calefaccion_lineal` en `master_dataset.csv`.
+- **`export_final_ia_dataset.py`**: genera `data/gold/dataset_final_ia.csv` con las features finales y el target.
+- **`train_nn_derroche_model_keras.py`**: entrena red neuronal binaria (TensorFlow/Keras) para `target_derroche_next_hour`.
+- **`app_predict_derroche.py`**: app CLI para inferencia de derroche.
+- **`run_pipeline.py`**: ejecuta todos los pasos en orden, de extremo a extremo.
+- **`archive/scripts/run_master_query.ps1`**: utilidad legacy (no recomendada en el flujo principal).
 
 ## Requisitos
 
@@ -16,10 +20,10 @@ Este directorio contiene scripts para ejecutar la consulta `master_query.sql` y 
 pip install -r requirements.txt
 ```
 
-O instalar directamente:
+O instalar directamente (mínimo):
 
 ```bash
-pip install pandas psycopg2-binary python-dotenv
+pip install pandas psycopg2-binary python-dotenv scikit-learn joblib tensorflow-cpu
 ```
 
 ### 2. Configurar conexión a PostgreSQL
@@ -45,85 +49,63 @@ DB_PASSWORD=admin
 
 > ⚠️ **IMPORTANTE**: El archivo `.env` contiene credenciales y NO debe ser commiteado a git. Está en `.gitignore`.
 
-## Uso
+## Uso recomendado
 
-### Opción 1: Ejecutar desde PowerShell (Windows) - RECOMENDADO
-
-```powershell
-cd C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\scripts
-.\run_master_query.ps1
-```
-
-### Opción 2: Ejecutar desde Python directamente
+### Pipeline completo
 
 ```bash
-python run_master_query.py
+python scripts/run_pipeline.py
 ```
 
-### Opción 3: Usar la versión alternativa con más opciones
+### Ejecución por pasos
 
 ```bash
-python execute_master_query.py
+python scripts/build_gold_dataset.py
+python scripts/train_linear_heating_model.py
+python scripts/build_gold_dataset.py
+python scripts/export_final_ia_dataset.py
+python scripts/train_nn_derroche_model_keras.py
 ```
 
 ## Output
 
-El script creará un archivo CSV en:
+Salidas principales:
 
 ```
-data/gold/master_query_result.csv
+data/gold/master_dataset.csv
+data/gold/dataset_final_ia.csv
+models/heating_linear_model.joblib
+models/nn_derroche_model_keras.keras
+models/nn_derroche_preprocess_keras.joblib
+reports/heating_linear_model_metrics.txt
+reports/nn_derroche_metrics_keras.txt
+reports/nn_derroche_backtest_keras.txt
 ```
 
-Con las siguientes columnas (en este orden):
-- `datetime`: Marca de tiempo (agrupada por hora)
-- `dia_semana`: Día de la semana (Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo)
-- `mes`: Nombre del mes (Enero, Febrero, Marzo, ..., Diciembre)
-- `hora`: Hora del día (0-23)
-- `temperatura_exterior`: Temperatura exterior promedio
-- `humedad_exterior`: Humedad exterior promedio
-- `presion`: Presión atmosférica
-- `nubosidad`: Nubosidad
-- `viento`: Velocidad del viento (moda)
-- `direccion_viento`: Dirección del viento (moda)
-- `azimuth_sol`: Azimut solar
-- `elevacion_sol`: Elevación solar
-- `temperatura_aula`: Temperatura del aula promedio
-- `humedad_aula`: Humedad del aula promedio
-- `forecast`: Pronóstico
+En `master_dataset.csv` quedan también derivadas:
+- `% ventilación ponderada`
+- `calefaccion_on_pred`
+- `derroche`
+- `target_derroche_next_hour`
+- `hora_sin`, `hora_cos`
 
 ## Solución de problemas
 
 ### Error: "Archivo de consulta no encontrado"
 
-Asegúrate de que estés ejecutando el script desde el directorio `scripts/` o que la ruta a `queries/master_query.sql` sea correcta.
+Asegúrate de que existe `queries/master_query.sql`.
 
-### Error: "Error de conexión"
+### Error: "Error de conexión PostgreSQL"
 
 1. Verifica que PostgreSQL esté corriendo
-2. Comprueba las credenciales de conexión
-3. Verifica que la base de datos existe y es accesible
+2. Comprueba `.env`
+3. Verifica host/puerto (`localhost:5433` en el entorno actual)
+4. `build_gold_dataset.py` usa fallback a CSV local si DB no está disponible
 
-### Error: "Módulo psycopg2 no encontrado"
+### Error: "Módulo no encontrado"
 
-Instala las dependencias:
+Reinstala dependencias:
 
 ```bash
-pip install psycopg2-binary
+pip install -r requirements.txt
 ```
-
-## Automatización (Windows Task Scheduler)
-
-Puedes automatizar la ejecución del script usando Windows Task Scheduler:
-
-1. Abre `taskschd.msc`
-2. Crea una nueva tarea
-3. En la pestaña "Acciones", añade una acción:
-   - Programa: `powershell.exe`
-   - Argumentos: `-NoProfile -ExecutionPolicy Bypass -File "C:\Users\Dario\Desktop\IABD\Proyecto_Domotica\scripts\run_master_query.ps1"`
-4. Configura la frecuencia deseada
-
-
-
-
-
-

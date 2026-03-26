@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""
+Construye el Gold unificado (Medallion) desde la unica fuente de verdad SQL.
+Salida unica: data/gold/master_dataset.csv
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+import sys
+
+import numpy as np
+import pandas as pd
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from utils.db_manager import query_to_dataframe
+from utils.config import DOOR_WEIGHT, TOTAL_WEIGHT_DIVISOR, WINDOW_WEIGHT_LARGE, WINDOW_WEIGHT_SMALL
+from utils.preprocessing import add_derroche_targets, add_hour_cyclical_features, add_weighted_ventilation_pct
+
+QUERY_FILE = BASE_DIR / "queries" / "master_query.sql"
+OUT_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+FALLBACK_FILES = [
+    BASE_DIR / "data" / "gold" / "master_dataset.csv",
+    BASE_DIR / "data" / "gold" / "master_query_result_with_temperature_history_pred.csv",
+    BASE_DIR / "data" / "gold" / "master_query_result.csv",
+]
+
+
+def add_calendar_columns(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+    out["datetime"] = pd.to_datetime(out["datetime"], utc=True, errors="coerce").dt.tz_localize(None)
+
+    dias_semana = {
+        0: "Lunes",
+        1: "Martes",
+        2: "Miércoles",
+        3: "Jueves",
+        4: "Viernes",
+        5: "Sábado",
+        6: "Domingo",
+    }
+    meses = {
+        1: "Enero",
+        2: "Febrero",
+        3: "Marzo",
+        4: "Abril",
+        5: "Mayo",
+        6: "Junio",
+        7: "Julio",
+        8: "Agosto",
+        9: "Septiembre",
+        10: "Octubre",
+        11: "Noviembre",
+        12: "Diciembre",
+    }
+    out["dia_semana"] = out["datetime"].dt.dayofweek.map(dias_semana)
+    out["mes"] = out["datetime"].dt.month.map(meses)
+    out["hora"] = out["datetime"].dt.hour
+    return out
+
+
+def add_heating_state_schedule(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.sort_values("datetime").copy()
+    temp_pred_col = "temp_calefaccion_lineal"
+    if temp_pred_col not in out.columns:
+        # fallback: aproximacion lineal simple basada en temperatura de aula
+        out[temp_pred_col] = pd.to_numeric(out.get("temperatura_aula"), errors="coerce")
+
+    dt = pd.to_datetime(out["datetime"], errors="coerce")
+    dow = dt.dt.weekday
+    minutes = dt.dt.hour * 60 + dt.dt.minute
+
+    def in_range(start_hm: tuple[int, int], end_hm: tuple[int, int]) -> pd.Series:
+        start = start_hm[0] * 60 + start_hm[1]
+        end = end_hm[0] * 60 + end_hm[1]
+        return minutes.ge(start) & minutes.le(end)
+
+    slot1 = (dow.le(4)) & in_range((6, 59), (11, 0))
+    slot2 = (dow.le(4)) & in_range((11, 2), (16, 0))
+    slot3 = (dow.le(4)) & in_range((16, 2), (18, 0))
+    slot4 = (dow.le(4)) & in_range((18, 2), (20, 40))
+    in_schedule = slot1 | slot2 | slot3 | slot4
+
+    t_off = pd.Series(np.nan, index=out.index, dtype="float64")
+    t_on = pd.Series(np.nan, index=out.index, dtype="float64")
+    t_off.loc[slot1 | slot2 | slot4] = 22.0
+    t_on.loc[slot1 | slot2 | slot4] = 21.9
+    t_off.loc[slot3] = 21.6
+    t_on.loc[slot3] = 21.5
+
+    temp = pd.to_numeric(out[temp_pred_col], errors="coerce")
+    state = 0
+    values: list[int] = []
+    prev_date = None
+    for idx in out.index:
+        cur_dt = dt.loc[idx]
+        cur_date = None if pd.isna(cur_dt) else cur_dt.date()
+        if prev_date is not None and cur_date is not None and cur_date != prev_date:
+            state = 0
+        prev_date = cur_date
+        if not bool(in_schedule.loc[idx]):
+            state = 0
+            values.append(state)
+            continue
+        cur_temp = temp.loc[idx]
+        if pd.isna(cur_temp):
+            values.append(state)
+            continue
+        if cur_temp > float(t_off.loc[idx]):
+            state = 0
+        elif cur_temp < float(t_on.loc[idx]):
+            state = 1
+        values.append(state)
+
+    out["calefaccion_on_pred"] = pd.Series(values, index=out.index, dtype="int8")
+    return out
+
+
+def main() -> None:
+    if not QUERY_FILE.exists():
+        raise FileNotFoundError(f"No existe {QUERY_FILE}")
+
+    query_template = QUERY_FILE.read_text(encoding="utf-8")
+    query = (
+        query_template.replace("{{DOOR_WEIGHT}}", str(DOOR_WEIGHT))
+        .replace("{{WINDOW_WEIGHT_LARGE}}", str(WINDOW_WEIGHT_LARGE))
+        .replace("{{WINDOW_WEIGHT_SMALL}}", str(WINDOW_WEIGHT_SMALL))
+        .replace("{{TOTAL_WEIGHT_DIVISOR}}", str(TOTAL_WEIGHT_DIVISOR))
+    )
+    try:
+        df = query_to_dataframe(query)
+        print("Fuente de datos: PostgreSQL (master_query.sql)")
+    except Exception as exc:
+        fallback_found = next((f for f in FALLBACK_FILES if f.exists()), None)
+        if fallback_found is None:
+            raise
+        print(f"Aviso: no se pudo consultar PostgreSQL ({exc}).")
+        print(f"Usando fallback local: {fallback_found}")
+        df = pd.read_csv(fallback_found)
+    df = add_calendar_columns(df)
+    df = add_weighted_ventilation_pct(df)
+    df = add_heating_state_schedule(df)
+    df = add_derroche_targets(df)
+    df["derroche"] = df["derroche"].astype("boolean")
+    df["target_derroche_next_hour"] = (
+        df["target_derroche_next_hour"].astype("boolean")
+    )
+    df = add_hour_cyclical_features(df)
+    # Aliases estables para IA (evita ambiguedad de nombres entre scripts).
+    if "temperatura_aula" in df.columns:
+        df["temp_aula"] = pd.to_numeric(df["temperatura_aula"], errors="coerce")
+    if "temperatura_exterior" in df.columns:
+        df["temp_ext"] = pd.to_numeric(df["temperatura_exterior"], errors="coerce")
+    if "elevacion_sol" in df.columns:
+        df["sol_elevacion"] = pd.to_numeric(df["elevacion_sol"], errors="coerce")
+
+    ordered_cols = ["datetime", "dia_semana", "mes", "hora"]
+    rest = [c for c in df.columns if c not in ordered_cols]
+    df = df[ordered_cols + rest]
+
+    OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(OUT_FILE, index=False)
+    print(f"OK gold unificado: {OUT_FILE} filas={len(df)} columnas={len(df.columns)}")
+
+
+if __name__ == "__main__":
+    main()

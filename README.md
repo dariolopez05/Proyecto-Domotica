@@ -1,6 +1,32 @@
 # Domótica — Proyecto de analítica/IA
 
-Estructura base para un proyecto de ingesta, limpieza, feature engineering, modelado y reporting.
+Proyecto de eficiencia energética orientado a detectar derroche en la siguiente hora con una arquitectura Medallion simplificada.
+
+## Estado actual (resumen rápido)
+
+- Capa Gold unificada en `data/gold/master_dataset.csv`.
+- Dataset final IA en `data/gold/dataset_final_ia.csv`.
+- Modelo lineal para temperatura de calefacción y red neuronal para derroche entrenados.
+- Scripts legacy movidos a `archive/scripts/`.
+- Estado detallado y trazabilidad: `PROYECTO_ESTADO.md`.
+- Guía de arquitectura y flujo: `docs/ARQUITECTURA_MEDALLION.md`.
+- Manual breve para presentación: `docs/MANUAL_1_PAGINA_PROFESOR.md`.
+- Auditoría técnica final: `docs/AUDITORIA_REPRODUCIBILIDAD.md`.
+
+## Pipeline operativo
+
+Ejecutar extremo a extremo:
+
+```bash
+python scripts/run_pipeline.py
+```
+
+Pasos internos:
+1. Construcción Gold (`build_gold_dataset.py`)
+2. Entrenamiento lineal calefacción (`train_linear_heating_model.py`)
+3. Rebuild Gold con columna lineal
+4. Export dataset final IA (`export_final_ia_dataset.py`)
+5. Entrenamiento red neuronal (Keras) (`train_nn_derroche_model_keras.py`)
 
 ## Objetivos
 
@@ -27,7 +53,7 @@ Domotica/
 │     └─ README.md
 ├─ presentacion/
 │  └─ README.md                    # colocar aquí la presentación final (PDF/PPTX)
-├─ bi/
+├─ archive/bi/                      # opcional (Power BI, archivado)
 │  ├─ README.md                    # dashboard + notas
 │  ├─ dashboard.pbix               # opcional (Power BI)
 │  └─ assets/

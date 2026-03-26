@@ -1,0 +1,12 @@
+BACKTEST TEMPORAL (walk-forward manual) - Keras derroche
+Dataset (train 80%): 4135 filas, pos=35 neg=4100
+Val window size: 496 (aprox 12.0% del train)
+
+Fold 1: skip (train pos=0 neg=2274; val pos=0 neg=496) train_n=2274 val_n=496
+Fold 2: skip (train pos=0 neg=2615; val pos=0 neg=496) train_n=2615 val_n=496
+Fold 3: skip (train pos=0 neg=2956; val pos=2 neg=494) train_n=2956 val_n=496
+Fold 4: skip (train pos=0 neg=3297; val pos=25 neg=471) train_n=3297 val_n=496
+Fold 5: train_n=3639 val_n=496 pos_val=23 thr=0.30 acc=0.6028 f1=0.1617 prec=0.0896 rec=0.8261 roc_auc=0.7292
+
+Media (folds): acc=0.6028 f1=0.1617 precision=0.0896 recall=0.8261 roc_auc=0.7292 thr=0.3000
+Std (folds):  acc=0.0000 f1=0.0000 precision=0.0000 recall=0.0000 roc_auc=0.0000 thr=0.0000

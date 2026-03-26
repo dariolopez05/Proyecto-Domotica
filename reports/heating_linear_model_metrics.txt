@@ -1,0 +1,13 @@
+MODELO LINEAL - TEMPERATURA CALEFACCION
+Filas train: 3460
+Filas test: 865
+Features: hora, temperatura_exterior, humedad_exterior, presion, nubosidad, viento, direccion_viento, azimuth_sol, elevacion_sol, temperatura_aula, humedad_aula, humidity_history, dia_semana, mes, forecast
+
+Metricas test temporal 80/20:
+- MAE: 1.0546
+- RMSE: 1.3469
+- R2: 0.1306
+
+Predicciones: C:\IABD\Poryectos Finales\Proyecto-Domotica\data\gold\heating_linear_predictions.csv
+Gold actualizado: C:\IABD\Poryectos Finales\Proyecto-Domotica\data\gold\master_dataset.csv
+Modelo guardado: C:\IABD\Poryectos Finales\Proyecto-Domotica\models\heating_linear_model.joblib
