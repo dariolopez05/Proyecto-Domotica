@@ -8,7 +8,7 @@ Este directorio contiene el flujo operativo unificado del proyecto.
 - **`train_linear_heating_model.py`**: entrena regresión lineal e inyecta `temp_calefaccion_lineal` en `master_dataset.csv`.
 - **`export_final_ia_dataset.py`**: genera `data/gold/dataset_final_ia.csv` con las features finales y el target.
 - **`train_nn_derroche_model_keras.py`**: entrena red neuronal binaria (TensorFlow/Keras) para `target_derroche_next_hour`.
-- **`app_predict_derroche.py`**: app CLI para inferencia de derroche.
+- **`app_predict_derroche.py`**: app CLI para inferencia de derroche (`--hora 0-23` o `--hora-sin`/`--hora-cos`).
 - **`run_pipeline.py`**: ejecuta todos los pasos en orden, de extremo a extremo.
 - **`archive/scripts/run_master_query.ps1`**: utilidad legacy (no recomendada en el flujo principal).
 
@@ -30,21 +30,19 @@ pip install pandas psycopg2-binary python-dotenv scikit-learn joblib tensorflow-
 
 Las credenciales se configuran en el archivo `.env` en la raíz del proyecto.
 
-**Ya está configurado con tus credenciales:**
-- Host: `localhost`
-- Puerto: `5433`
-- Base de datos: `domotica`
-- Usuario: `postgres`
-- Contraseña: `admin`
+**Variables típicas** (copia `.env.example` a `.env` y rellena):
 
-**Si necesitas cambiar las credenciales**, edita el archivo `.env`:
+- Host: `localhost`
+- Puerto: `5432` (o el que uses)
+- Base de datos: `postgres` (o la que contenga `ltss`)
+- Usuario / contraseña: según tu instalación
 
 ```
 DB_HOST=localhost
-DB_PORT=5433
-DB_NAME=domotica
+DB_PORT=5432
+DB_NAME=postgres
 DB_USER=postgres
-DB_PASSWORD=admin
+DB_PASSWORD=tu_contraseña
 ```
 
 > ⚠️ **IMPORTANTE**: El archivo `.env` contiene credenciales y NO debe ser commiteado a git. Está en `.gitignore`.
@@ -87,7 +85,7 @@ En `master_dataset.csv` quedan también derivadas:
 - `calefaccion_on_pred`
 - `derroche`
 - `target_derroche_next_hour`
-- `hora_sin`, `hora_cos`
+- `hora_sin`, `hora_cos`, `dia_semana_sin`, `dia_semana_cos`, `mes_sin`, `mes_cos`
 
 ## Solución de problemas
 
@@ -99,7 +97,7 @@ Asegúrate de que existe `queries/master_query.sql`.
 
 1. Verifica que PostgreSQL esté corriendo
 2. Comprueba `.env`
-3. Verifica host/puerto (`localhost:5433` en el entorno actual)
+3. Verifica host/puerto en `.env` (p. ej. `localhost` y `5432`)
 4. `build_gold_dataset.py` usa fallback a CSV local si DB no está disponible
 
 ### Error: "Módulo no encontrado"

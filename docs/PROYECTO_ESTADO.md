@@ -3,7 +3,7 @@
 ## 1) Infraestructura (segun PDF vs estado real)
 
 - **PDF indica:** TimescaleDB/PostgreSQL en `172.16.204.240:5432`, BD `postgres`.
-- **Estado actual del proyecto:** PostgreSQL local en `localhost:5433`, BD `domotica`, usuario `postgres`.
+- **Estado actual del proyecto:** PostgreSQL local (p. ej. `localhost:5432`), BD `postgres`, usuario `postgres` (credenciales en `.env`).
 - **Decision actual:** trabajar en local para desarrollo/ejecucion de scripts.
 - **Impacto:** las queries y scripts son validos, pero para entrega hay que documentar claramente esta diferencia respecto al entorno del PDF.
 
@@ -50,9 +50,9 @@
 
 ## Fase A - Definicion del problema
 
-- **T1 Target:** **PARCIAL**
-  - Definido a alto nivel: detectar derroche energetico.
-  - Pendiente cerrar formalmente el umbral X%/minutos de derroche y dejarlo como criterio unico en documento tecnico.
+- **T1 Target:** **HECHO (documentado)**
+  - Derroche: calefaccion on (normas History) + ventilacion ponderada **> 15 %** (`DERROCHE_VENTILATION_THRESHOLD_PCT`).
+  - Criterio unico descrito en `docs/entrega/MEMORIA_TECNICA.md` y `README.md`.
 
 ## Fase B - Recopilacion y preparacion de datos
 
@@ -80,7 +80,10 @@
 - **T10 (PDF) Red neuronal binaria derroche si/no:** **HECHO**
   - Evidencia: `scripts/train_nn_derroche_model_keras.py`, `models/nn_derroche_model_keras.keras`, `reports/nn_derroche_metrics_keras.txt`.
 - **T11 App de prediccion de derroche:** **HECHO (version CLI minima)**
-  - Evidencia: `scripts/app_predict_derroche.py` (inferencia con Keras: probabilidad + umbral).
+  - Evidencia: `scripts/app_predict_derroche.py` (inferencia con Keras: probabilidad + umbral; entrada legible con `--hora 0-23` o sin/cos como en el dataset).
+
+- **Dataset final IA + predicciones (pipeline cerrado para entrega):** **CERRADO**
+  - `data/gold/dataset_final_ia.csv`, export con filtro calefaccion on + huecos imputados en entrenamiento; `scripts/generate_data_report.py` para informe HTML legible.
 
 ## Fase D - Dashboard
 
@@ -107,7 +110,7 @@
 
 ## 6) Entregables del PDF: estado rapido
 
-- Documento tecnico PDF con decisiones/justificacion/evidencias: **PENDIENTE DE CIERRE**.
+- Documento tecnico (memoria Markdown + export PDF opcional): **HECHO** (`docs/entrega/MEMORIA_TECNICA.md`); PDF de entrega si el centro lo pide: generar desde el .md o adjuntar impresion.
 - Scripts SQL/Python de extraccion y agregacion: **HECHO**.
 - Modelo ML lineal entrenado + metricas: **HECHO**.
 - Red neuronal entrenada + metricas: **HECHO**.
@@ -118,7 +121,7 @@
 
 1. Montar dashboard Grafana con los minimos exigidos (2 visualizaciones + selector sensor).
 2. Mejorar T11 de app CLI a app web (opcional pero recomendable para defensa).
-3. Completar memoria tecnica y presentacion con evidencia (decision + justificacion + metricas/consultas/graficas).
+3. Presentacion 5-8 diapositivas con evidencia (metricas, consultas, graficas); memoria tecnica en `docs/entrega/MEMORIA_TECNICA.md`.
 
 ## 8) Flujo operativo actual (comando único)
 
@@ -138,10 +141,14 @@ Ejecuta secuencialmente:
 - Arquitectura y responsabilidades por componente:
   - `docs/ARQUITECTURA_MEDALLION.md`
 - Manual ejecutivo de 1 página (orientado a defensa/entrega):
-  - `docs/MANUAL_1_PAGINA_PROFESOR.md`
+  - `docs/entrega/MANUAL_1_PAGINA_PROFESOR.md`
 - Auditoría final de reproducibilidad:
-  - `docs/AUDITORIA_REPRODUCIBILIDAD.md`
+  - `reports/AUDITORIA_REPRODUCIBILIDAD.md`
 - Estado y trazabilidad de tareas PDF:
-  - `PROYECTO_ESTADO.md`
+  - `docs/PROYECTO_ESTADO.md` (este archivo)
+- Memoria tecnica (decisiones y justificaciones):
+  - `docs/entrega/MEMORIA_TECNICA.md`
 - Uso operativo de scripts:
   - `scripts/README_MASTER_QUERY.md`
+- Comparativa requisitos PDF vs implementacion:
+  - `docs/COMPARATIVA_REQUISITOS_PDF.md`

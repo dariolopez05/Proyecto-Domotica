@@ -22,7 +22,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MASTER_FILE = BASE_DIR / "data" / "gold" / "master_query_result.csv"
-HISTORY_FILE = BASE_DIR / "data" / "History_2025-09-01_100-2026-03-02_1400.csv"
+HISTORY_FILE = BASE_DIR / "data" / "bronze" / "History_2025-09-01_100-2026-03-02_1400.csv"
 PREDICTIONS_FILE = BASE_DIR / "data" / "gold" / "history_temperature_predictions.csv"
 METRICS_FILE = BASE_DIR / "reports" / "history_temperature_model_metrics.txt"
 CONTRAST_FILE = BASE_DIR / "reports" / "history_temperature_contraste_real_vs_pred.txt"

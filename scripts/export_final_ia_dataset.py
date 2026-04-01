@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """
 Exporta el dataset final de IA desde master_dataset.csv.
+
+Solo filas con calefaccion encendida (1): si esta apagada (0), no sirve para
+entrenar/inferir el modelo de derroche. Usa `calefaccion_on_normas_history`
+si existe; si no, `calefaccion_on_pred`.
+
+Las features pueden llevar NaN: el imputer del entrenamiento Keras (fit en train)
+las rellena; no se hace dropna global aqui para no descartar filas imputables.
 """
 
 from __future__ import annotations
@@ -23,6 +30,10 @@ def main() -> None:
     required_cols = [
         "hora_sin",
         "hora_cos",
+        "dia_semana_sin",
+        "dia_semana_cos",
+        "mes_sin",
+        "mes_cos",
         "temp_aula",
         "temp_ext",
         "humedad_aula",
@@ -36,8 +47,17 @@ def main() -> None:
     if missing:
         raise ValueError(f"Faltan columnas en master_dataset: {missing}")
 
+    heat_col = (
+        "calefaccion_on_normas_history"
+        if "calefaccion_on_normas_history" in df.columns
+        else "calefaccion_on_pred"
+    )
+    if heat_col in df.columns:
+        heat_on = pd.to_numeric(df[heat_col], errors="coerce").fillna(0).astype(int).eq(1)
+        df = df.loc[heat_on].copy()
+
     out = df[required_cols].copy()
-    # Evita arrastrar la ultima fila sin target por el shift(-1).
+    # Sin target no hay supervision (p. ej. ultima fila tras shift(-1)).
     out = out.dropna(subset=["target_derroche_next_hour"])
     out["target_derroche_next_hour"] = (
         out["target_derroche_next_hour"]
@@ -45,7 +65,7 @@ def main() -> None:
         .fillna(0)
         .astype(int)
     )
-    out = out.dropna()
+    # Features con huecos: se dejan como NaN para SimpleImputer en train_nn_derroche_model_keras.py
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUT_FILE, index=False)
     print(f"OK export IA: {OUT_FILE} filas={len(out)}")

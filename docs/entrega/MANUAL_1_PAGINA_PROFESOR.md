@@ -10,8 +10,8 @@
 
 Se considera derroche cuando:
 
-- la calefacción está encendida (`calefaccion_on_pred = 1`)
-- y la ventilación ponderada supera el 15% (`porcentaje_ventilacion_aula > 15`)
+- la calefacción está encendida según normas sobre temperatura History (`calefaccion_on_normas_history = 1`)
+- y la ventilación ponderada es **estrictamente mayor al 15 %** (`porcentaje_ventilacion_aula > 15`)
 
 Objetivo de IA:
 
@@ -30,7 +30,7 @@ Objetivo de IA:
 
 ### Variables clave usadas
 
-- Contexto temporal: `hora_sin`, `hora_cos`
+- Contexto temporal (cíclico): `hora_sin`/`hora_cos`, `dia_semana_sin`/`dia_semana_cos`, `mes_sin`/`mes_cos`
 - Entorno: `temp_ext`, `viento`, `nubosidad`, `sol_elevacion`
 - Aula: `temp_aula`, `humedad_aula`
 - Ventilación: `porcentaje_ventilacion_aula`
@@ -62,12 +62,13 @@ Objetivo de IA:
 
 ## 2) Modelo IA (red neuronal) (Fase C)
 
-- Script: `scripts/train_nn_derroche_model.py`
-- Modelo: `MLPClassifier` (clasificación binaria)
+- Script: `scripts/train_nn_derroche_model_keras.py`
+- Modelo: TensorFlow/Keras (MLP tabular Dense → Dense → sigmoid)
 - Target: `target_derroche_next_hour`
 - Artefactos:
-  - `models/nn_derroche_model.joblib`
-  - `reports/nn_derroche_metrics.txt`
+  - `models/nn_derroche_model_keras.keras`
+  - `models/nn_derroche_preprocess_keras.joblib` (imputer, scaler, umbral)
+  - `reports/nn_derroche_metrics_keras.txt`
 
 ---
 
@@ -84,13 +85,15 @@ Incluye:
 2. Entrenamiento lineal
 3. Rebuild Gold con columna lineal
 4. Export dataset IA
-5. Entrenamiento red neuronal
+5. Entrenamiento red neuronal (Keras)
 
 Predicción manual por CLI:
 
 ```bash
-python scripts/app_predict_derroche.py --hora-sin ... --hora-cos ... --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
+python scripts/app_predict_derroche.py --fecha "2025-12-18 14:00:00" --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
 ```
+
+O con hora suelta: `--hora 14 --dia-semana 3 --mes 12` (día 0=Lunes…6=Domingo). El script calcula los seis senos/cosenos como en el CSV.
 
 ---
 
@@ -98,8 +101,9 @@ python scripts/app_predict_derroche.py --hora-sin ... --hora-cos ... --temp-aula
 
 - Fase A/B/C: implementadas en código y dataset.
 - Fase D (dashboard Grafana): pendiente.
-- Presentación y memoria técnica final: pendiente de cierre documental.
+- Presentación de cierre: pendiente.
+- Memoria técnica: [`MEMORIA_TECNICA.md`](MEMORIA_TECNICA.md) (esta carpeta `docs/entrega/`).
 
-Referencia de estado detallado:
+Referencia de estado detallado del proyecto:
 
-- `PROYECTO_ESTADO.md`
+- [`../PROYECTO_ESTADO.md`](../PROYECTO_ESTADO.md)

@@ -28,7 +28,12 @@ def scale_features(df: pd.DataFrame, feature_cols: list[str]) -> tuple[pd.DataFr
 
 def add_derroche_targets(df: pd.DataFrame, threshold_pct: float = DERROCHE_VENTILATION_THRESHOLD_PCT) -> pd.DataFrame:
     out = df.copy()
-    heat_on = pd.to_numeric(out.get("calefaccion_on_pred"), errors="coerce").fillna(0).astype(int).eq(1)
+    heat_col = (
+        "calefaccion_on_normas_history"
+        if "calefaccion_on_normas_history" in out.columns
+        else "calefaccion_on_pred"
+    )
+    heat_on = pd.to_numeric(out.get(heat_col), errors="coerce").fillna(0).astype(int).eq(1)
     vent_high = pd.to_numeric(out.get("porcentaje_ventilacion_aula"), errors="coerce").fillna(0.0).gt(
         float(threshold_pct)
     )
@@ -37,10 +42,29 @@ def add_derroche_targets(df: pd.DataFrame, threshold_pct: float = DERROCHE_VENTI
     return out
 
 
-def add_hour_cyclical_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_temporal_cyclical_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Codificación cíclica coherente con el PDF: hora, día de la semana y mes.
+    - Hora: columna `hora` (0-23) o derivada de `datetime`.
+    - Día: pandas dayofweek 0=Lunes … 6=Domingo.
+    - Mes: 1-12 en ciclo anual (enero y diciembre vecinos en el círculo).
+    """
     out = df.copy()
+    dt = pd.to_datetime(out["datetime"], errors="coerce")
     hour = pd.to_numeric(out.get("hora"), errors="coerce")
+    hour = hour.fillna(dt.dt.hour).astype(float)
     out["hora_sin"] = np.sin(2 * np.pi * hour / 24.0)
     out["hora_cos"] = np.cos(2 * np.pi * hour / 24.0)
+    dow = dt.dt.dayofweek.astype(float)
+    out["dia_semana_sin"] = np.sin(2 * np.pi * dow / 7.0)
+    out["dia_semana_cos"] = np.cos(2 * np.pi * dow / 7.0)
+    mes = dt.dt.month.astype(float)
+    out["mes_sin"] = np.sin(2 * np.pi * (mes - 1.0) / 12.0)
+    out["mes_cos"] = np.cos(2 * np.pi * (mes - 1.0) / 12.0)
     return out
+
+
+def add_hour_cyclical_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Alias: incluye hora, día de semana y mes (ver `add_temporal_cyclical_features`)."""
+    return add_temporal_cyclical_features(df)
 

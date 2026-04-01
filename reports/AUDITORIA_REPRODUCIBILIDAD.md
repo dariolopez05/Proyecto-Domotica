@@ -76,7 +76,7 @@ Nota:
 
 ## Hallazgo A (alto impacto operativo)
 
-- **DB local inaccesible** durante la auditoría (`localhost:5433` rechazó conexión).
+- **DB local inaccesible** durante la auditoría (servidor no disponible / credenciales no cargadas; el pipeline usó fallback CSV).
 - Mitigación actual:
   - fallback automático a CSV local.
 - Riesgo residual:

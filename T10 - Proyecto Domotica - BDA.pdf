@@ -11,10 +11,10 @@ Home Assistant: servidor domótico que integra sensores y fuentes externas.
 Mosquitto (MQTT): broker de mensajería.
 Zigbee2MQTT + SLZB-06: pasarela Zigbee ↔ MQTT.
 TimescaleDB (PostgreSQL): base de datos de series temporales para almacenar medidas.
-IP: 172.16.204.240
+IP: localhost
 Puerto: 5432
 usuario: postgres
-contraseña:
+contraseña: admin1234
 Base de datos: postgres
 Sensores:
 Aqara MCCGQ11LM: puertas/ventanas (abierto/cerrado).
