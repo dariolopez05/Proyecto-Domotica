@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eficiencia Energética del Aula — Domótica + IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+.slide {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.slide-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 100%;
+  overflow: hidden;
+  padding: var(--slide-padding);
+}
+:root {
+  --title-size: clamp(1.5rem, 5vw, 4rem);
+  --h2-size: clamp(1.1rem, 3vw, 2.2rem);
+  --h3-size: clamp(0.9rem, 2vw, 1.5rem);
+  --body-size: clamp(0.72rem, 1.3vw, 1rem);
+  --small-size: clamp(0.62rem, 0.9vw, 0.82rem);
+  --slide-padding: clamp(1.5rem, 5vw, 5rem);
+  --content-gap: clamp(0.6rem, 2vw, 2rem);
+  --element-gap: clamp(0.25rem, 0.8vw, 0.8rem);
+
+  /* Neon Cyber palette */
+  --bg: #050d1a;
+  --surface: #0c1829;
+  --card: #0f2040;
+  --border: rgba(0,230,255,0.15);
+  --cyan: #00e5ff;
+  --magenta: #ff2d78;
+  --yellow: #f7e84e;
+  --text: #e8f4ff;
+  --text-muted: rgba(232,244,255,0.55);
+  --glow-cyan: 0 0 20px rgba(0,230,255,0.4);
+  --glow-magenta: 0 0 20px rgba(255,45,120,0.4);
+}
+.card, .container, .content-box {
+  max-width: min(90vw, 1100px);
+  max-height: min(80vh, 700px);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+img, .image-container { max-width: 100%; max-height: min(50vh, 400px); object-fit: contain; }
+
+@media (max-height: 700px) {
+  :root { --slide-padding: clamp(0.75rem, 3vw, 2rem); --content-gap: clamp(0.4rem, 1.5vw, 1rem); --title-size: clamp(1.2rem, 4vw, 2.5rem); --h2-size: clamp(0.9rem, 2.5vw, 1.75rem); }
+}
+@media (max-height: 600px) {
+  :root { --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem); --content-gap: clamp(0.3rem, 1vw, 0.75rem); --title-size: clamp(1rem, 3.5vw, 1.8rem); --body-size: clamp(0.65rem, 1.1vw, 0.9rem); }
+  .decorative, .keyboard-hint { display: none; }
+}
+@media (max-height: 500px) {
+  :root { --slide-padding: clamp(0.4rem, 2vw, 1rem); --title-size: clamp(0.9rem, 3vw, 1.4rem); --h2-size: clamp(0.8rem, 2vw, 1.1rem); --body-size: clamp(0.6rem, 1vw, 0.8rem); }
+}
+@media (max-width: 600px) {
+  :root { --title-size: clamp(1.3rem, 7vw, 2.5rem); }
+  .grid { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   THEME: NEON CYBER
+   =========================================== */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-size: var(--body-size);
+}
+
+/* Grid overlay background */
+.slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,230,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.slide-content { position: relative; z-index: 1; }
+
+/* Decorative glowing orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+.orb-cyan { background: radial-gradient(circle, rgba(0,230,255,0.4) 0%, transparent 70%); }
+.orb-magenta { background: radial-gradient(circle, rgba(255,45,120,0.3) 0%, transparent 70%); }
+.orb-blue { background: radial-gradient(circle, rgba(30,100,255,0.35) 0%, transparent 70%); }
+
+/* Typography */
+h1 { font-family: 'Clash Display', sans-serif; font-size: var(--title-size); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; }
+h2 { font-family: 'Clash Display', sans-serif; font-size: var(--h2-size); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+h3 { font-family: 'Satoshi', sans-serif; font-size: var(--h3-size); font-weight: 500; }
+p, li { font-size: var(--body-size); line-height: 1.55; }
+
+.text-cyan { color: var(--cyan); }
+.text-magenta { color: var(--magenta); }
+.text-muted { color: var(--text-muted); }
+.text-yellow { color: var(--yellow); }
+
+/* Glowing underline accent */
+.accent-line {
+  display: inline-block;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  box-shadow: var(--glow-cyan);
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(0.75rem, 1.5vw, 1.5rem);
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+}
+.card-cyan { border-color: rgba(0,230,255,0.3); }
+.card-cyan::before { background: var(--cyan); }
+.card-magenta { border-color: rgba(255,45,120,0.3); }
+.card-magenta::before { background: var(--magenta); }
+.card-yellow { border-color: rgba(247,232,78,0.3); }
+.card-yellow::before { background: var(--yellow); }
+
+/* Metric chips */
+.metric { display: flex; flex-direction: column; gap: 0.15em; }
+.metric-value { font-family: 'Clash Display', sans-serif; font-size: clamp(1.2rem, 3.5vw, 2.8rem); font-weight: 700; line-height: 1; }
+.metric-label { font-size: var(--small-size); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Tag / badge */
+.tag {
+  display: inline-block;
+  font-size: var(--small-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2em 0.7em;
+  border-radius: 20px;
+  border: 1px solid currentColor;
+}
+.tag-cyan { color: var(--cyan); background: rgba(0,230,255,0.1); }
+.tag-magenta { color: var(--magenta); background: rgba(255,45,120,0.1); }
+.tag-yellow { color: var(--yellow); background: rgba(247,232,78,0.1); }
+
+/* Step list */
+.step-list { list-style: none; display: flex; flex-direction: column; gap: var(--element-gap); }
+.step-list li { display: flex; align-items: flex-start; gap: 0.6em; }
+.step-num {
+  flex-shrink: 0;
+  width: clamp(1.2rem, 2.5vw, 1.8rem);
+  height: clamp(1.2rem, 2.5vw, 1.8rem);
+  background: var(--cyan);
+  color: var(--bg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--small-size);
+  font-weight: 700;
+  font-family: 'Clash Display', sans-serif;
+}
+.step-num.mag { background: var(--magenta); }
+.step-num.yel { background: var(--yellow); }
+
+/* Pipeline arrow */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.3rem, 1vw, 0.8rem);
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.pipe-node {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: clamp(0.4rem, 1vw, 0.8rem) clamp(0.5rem, 1.2vw, 1rem);
+  text-align: center;
+  font-size: var(--small-size);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pipe-arrow {
+  color: var(--cyan);
+  font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Two-column layout */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  align-items: start;
+}
+
+/* Horizontal rule */
+.rule { height: 1px; background: var(--border); margin: var(--element-gap) 0; }
+
+/* Section label */
+.section-label {
+  font-size: var(--small-size);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-bottom: clamp(0.3rem, 0.8vw, 0.6rem);
+}
+
+/* Navigation */
+nav.slide-nav {
+  position: fixed;
+  right: clamp(0.8rem, 2vw, 1.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 100;
+}
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0,230,255,0.25);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.nav-dot.active { background: var(--cyan); transform: scale(1.6); box-shadow: var(--glow-cyan); }
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  bottom: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  box-shadow: var(--glow-cyan);
+  z-index: 100;
+  transition: width 0.3s ease;
+}
+
+/* Keyboard hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: clamp(0.6rem, 1.5vw, 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--small-size);
+  color: var(--text-muted);
+  z-index: 100;
+  display: flex; align-items: center; gap: 0.4em;
+  letter-spacing: 0.04em;
+}
+kbd {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--cyan);
+}
+
+/* Reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+
+/* Scan line overlay */
+.slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.04) 4px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================
+   SLIDE-SPECIFIC
+   ================== */
+
+/* SLIDE 1: COVER */
+#slide-1 {
+  background: radial-gradient(ellipse at 20% 50%, #0d1f3c 0%, var(--bg) 60%);
+  justify-content: center;
+}
+#slide-1 .orb-1 { width: 55vw; height: 55vw; top: -20%; right: -15%; }
+#slide-1 .orb-2 { width: 35vw; height: 35vw; bottom: -10%; left: -5%; }
+.cover-tag { margin-bottom: clamp(0.6rem, 1.5vw, 1.2rem); }
+.cover-title { margin-bottom: clamp(0.3rem, 0.8vw, 0.6rem); }
+.cover-subtitle { color: var(--text-muted); font-size: var(--h3-size); margin-bottom: clamp(1rem, 2.5vw, 2rem); max-width: 60ch; line-height: 1.4; }
+.cover-meta { display: flex; gap: clamp(0.8rem, 2vw, 2rem); flex-wrap: wrap; align-items: center; }
+.cover-line { width: clamp(60px, 15vw, 140px); margin: clamp(0.5rem, 1.2vw, 1rem) 0; }
+
+/* SLIDE 2: PROBLEM */
+#slide-2 { background: var(--bg); }
+#slide-2 .orb-1 { width: 40vw; height: 40vw; bottom: -15%; right: -10%; }
+
+/* SLIDE 3: INFRASTRUCTURE */
+#slide-3 { background: var(--bg); }
+#slide-3 .orb-1 { width: 35vw; height: 35vw; top: -10%; left: -5%; }
+#slide-3 .orb-2 { width: 25vw; height: 25vw; bottom: -5%; right: -5%; }
+
+/* SLIDE 4: DATA PREP */
+#slide-4 { background: var(--bg); }
+#slide-4 .orb-1 { width: 40vw; height: 40vw; top: -15%; right: -10%; }
+
+/* SLIDE 5: MODELS */
+#slide-5 { background: var(--bg); }
+#slide-5 .orb-1 { width: 35vw; height: 35vw; bottom: -15%; left: -10%; }
+#slide-5 .orb-2 { width: 25vw; height: 25vw; top: -10%; right: -5%; }
+
+/* SLIDE 6: DASHBOARD + CONCLUSIONS */
+#slide-6 {
+  background: radial-gradient(ellipse at 80% 50%, #1a0d2e 0%, var(--bg) 60%);
+}
+#slide-6 .orb-1 { width: 45vw; height: 45vw; top: -15%; left: -10%; }
+#slide-6 .orb-2 { width: 30vw; height: 30vw; bottom: -10%; right: -5%; }
+
+/* Architecture flow */
+.arch-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.arch-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4em 0.9em;
+  font-size: var(--small-size);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+.arch-arrow { color: var(--cyan); opacity: 0.6; font-size: var(--body-size); }
+
+/* Confusion matrix mini */
+.cm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  width: min(120px, 20vw);
+}
+.cm-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--small-size);
+  font-weight: 700;
+  font-family: 'Clash Display', sans-serif;
+}
+.cm-tn { background: rgba(0,230,255,0.25); color: var(--cyan); }
+.cm-fp { background: rgba(255,45,120,0.2); color: var(--magenta); }
+.cm-fn { background: rgba(255,45,120,0.15); color: var(--magenta); }
+.cm-tp { background: rgba(0,230,255,0.35); color: var(--cyan); }
+.cm-label { font-size: var(--small-size); color: var(--text-muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<nav class="slide-nav" aria-label="Navegación de diapositivas">
+  <div class="nav-dot active" data-slide="0" title="Portada"></div>
+  <div class="nav-dot" data-slide="1" title="Problema"></div>
+  <div class="nav-dot" data-slide="2" title="Infraestructura"></div>
+  <div class="nav-dot" data-slide="3" title="Datos"></div>
+  <div class="nav-dot" data-slide="4" title="Modelos"></div>
+  <div class="nav-dot" data-slide="5" title="Resultados"></div>
+  <div class="nav-dot" data-slide="6" title="Gracias"></div>
+</nav>
+<div class="progress-bar" id="progress"></div>
+<div class="keyboard-hint" aria-hidden="true">
+  <kbd>↑</kbd><kbd>↓</kbd> o <kbd>rueda</kbd> para navegar
+</div>
+
+<main>
+
+  <!-- ===================== SLIDE 1: PORTADA ===================== -->
+  <section class="slide" id="slide-1" data-index="0" aria-label="Portada">
+    <div class="orb orb-cyan orb-1 decorative"></div>
+    <div class="orb orb-magenta orb-2 decorative"></div>
+    <div class="slide-content" style="justify-content:center;">
+      <div class="cover-tag reveal">
+        <span class="tag tag-cyan">BDA · 2025 – 2026</span>
+      </div>
+      <h1 class="cover-title reveal reveal-delay-1">
+        Eficiencia<br>
+        <span class="text-cyan">Energética</span><br>
+        del Aula
+      </h1>
+      <div class="accent-line cover-line reveal reveal-delay-2"></div>
+      <p class="cover-subtitle reveal reveal-delay-3">
+        Domótica + IA para detectar y predecir derroche de calefacción
+        en la siguiente hora mediante sensores IoT y redes neuronales.
+      </p>
+      <div class="cover-meta reveal reveal-delay-4">
+        <span class="tag tag-magenta">IoT · TimescaleDB · Python</span>
+        <span class="tag tag-yellow">Machine Learning · Keras</span>
+        <span class="tag tag-cyan">Grafana · Home Assistant</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 2: PROBLEMA ===================== -->
+  <section class="slide" id="slide-2" data-index="1" aria-label="Contexto y Problema">
+    <div class="orb orb-magenta orb-1 decorative"></div>
+    <div class="slide-content">
+      <div class="section-label reveal">Fase A — Definición del problema</div>
+      <h2 class="reveal reveal-delay-1">¿Qué problema<br><span class="text-cyan">resolvemos?</span></h2>
+      <div class="accent-line reveal reveal-delay-1" style="width:clamp(40px,8vw,80px);margin:clamp(0.4rem,1vw,0.8rem) 0;"></div>
+      <div class="two-col reveal reveal-delay-2" style="margin-top:var(--content-gap);">
+        <div>
+          <div class="card card-magenta" style="margin-bottom:var(--element-gap);">
+            <div class="section-label">Situación de derroche</div>
+            <p>Calefacción <strong style="color:var(--magenta)">encendida</strong> mientras ventanas o puerta están abiertas más del <strong style="color:var(--cyan)">15%</strong> del peso total.</p>
+          </div>
+          <div class="card card-cyan">
+            <div class="section-label">Target del modelo</div>
+            <p style="font-family:'Clash Display',sans-serif;font-size:var(--body-size);color:var(--cyan);">target_derroche_next_hour</p>
+            <p>Predicción <strong>1 hora antes</strong> de que ocurra el derroche, para poder actuar a tiempo.</p>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:var(--element-gap);">
+            <div class="section-label">Peso de apertura (ventilación)</div>
+            <ul class="step-list" style="margin-top:0.4rem;">
+              <li><span class="step-num">4</span><span>Puerta</span></li>
+              <li><span class="step-num">2</span><span>Ventana grande (inferior, impar)</span></li>
+              <li><span class="step-num">1</span><span>Ventana pequeña (superior, par)</span></li>
+            </ul>
+            <div class="rule"></div>
+            <p class="text-muted" style="font-size:var(--small-size);">Divisor total: 20 — Umbral derroche: <span style="color:var(--cyan)">ventilación &gt; 15%</span></p>
+          </div>
+          <div class="card card-yellow">
+            <div class="section-label">Calefacción ON — criterio</div>
+            <p>T<sub>off</sub> = 22.0 °C · T<sub>on</sub> = 21.9 °C<br>
+            Lunes–Viernes, en horario escolar.<br>
+            <span class="text-muted">Ventana 11 excluida (lecturas erróneas).</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 3: INFRAESTRUCTURA ===================== -->
+  <section class="slide" id="slide-3" data-index="2" aria-label="Infraestructura y Arquitectura">
+    <div class="orb orb-cyan orb-1 decorative"></div>
+    <div class="orb orb-blue orb-2 decorative"></div>
+    <div class="slide-content">
+      <div class="section-label reveal">Fase B — Infraestructura y datos</div>
+      <h2 class="reveal reveal-delay-1">Arquitectura <span class="text-cyan">Medallion</span></h2>
+      <div class="accent-line reveal reveal-delay-1" style="width:clamp(40px,8vw,80px);margin:clamp(0.3rem,0.8vw,0.6rem) 0;"></div>
+
+      <div class="pipeline reveal reveal-delay-2" style="margin:var(--element-gap) 0;">
+        <div class="pipe-node" style="border-color:rgba(255,45,120,0.4);color:var(--magenta);">PostgreSQL<br><span style="color:var(--text-muted);font-weight:400;">ltss (TimescaleDB)</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:rgba(255,45,120,0.3);">Bronze<br><span style="color:var(--text-muted);font-weight:400;">CSV History</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:rgba(0,230,255,0.3);color:var(--cyan);">Gold<br><span style="color:var(--text-muted);font-weight:400;">master_dataset.csv</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:rgba(247,232,78,0.3);color:var(--yellow);">Dataset IA<br><span style="color:var(--text-muted);font-weight:400;">dataset_final_ia.csv</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-node" style="border-color:rgba(0,230,255,0.4);color:var(--cyan);">Modelos<br><span style="color:var(--text-muted);font-weight:400;">.keras + .joblib</span></div>
+      </div>
+
+      <div class="grid reveal reveal-delay-3" style="margin-top:var(--content-gap);">
+        <div class="card card-magenta">
+          <div class="section-label">Sensores IoT</div>
+          <ul class="step-list">
+            <li><span class="step-num mag">·</span><span>Aqara: temp/hum/presión</span></li>
+            <li><span class="step-num mag">·</span><span>Aqara: puertas &amp; ventanas</span></li>
+            <li><span class="step-num mag">·</span><span>Met.no: temp exterior, viento, nubosidad</span></li>
+            <li><span class="step-num mag">·</span><span>Sun: azimut y elevación solar</span></li>
+          </ul>
+        </div>
+        <div class="card card-cyan">
+          <div class="section-label">Stack tecnológico</div>
+          <ul class="step-list">
+            <li><span class="step-num">·</span><span>Home Assistant + MQTT</span></li>
+            <li><span class="step-num">·</span><span>Zigbee2MQTT / SLZB-06</span></li>
+            <li><span class="step-num">·</span><span>TimescaleDB (PostgreSQL)</span></li>
+            <li><span class="step-num">·</span><span>Python · scikit-learn · Keras · Grafana</span></li>
+          </ul>
+        </div>
+        <div class="card card-yellow">
+          <div class="section-label">Dataset Gold</div>
+          <div style="display:flex;gap:1rem;align-items:center;margin-top:0.3rem;">
+            <div class="metric"><span class="metric-value text-yellow">9 262</span><span class="metric-label">filas (horas)</span></div>
+            <div class="metric"><span class="metric-value text-cyan">5 170</span><span class="metric-label">filas IA</span></div>
+          </div>
+          <p class="text-muted" style="margin-top:0.4rem;font-size:var(--small-size);">Sep 2025 – Mar 2026 · Agregación horaria vía SQL</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 4: PREPARACIÓN DE DATOS ===================== -->
+  <section class="slide" id="slide-4" data-index="3" aria-label="Preparación de Datos">
+    <div class="orb orb-cyan orb-1 decorative"></div>
+    <div class="slide-content">
+      <div class="section-label reveal">Fase B — Correlaciones y features</div>
+      <h2 class="reveal reveal-delay-1">Preparación de <span class="text-magenta">Datos</span></h2>
+      <div class="accent-line reveal reveal-delay-1" style="width:clamp(40px,8vw,80px);margin:clamp(0.3rem,0.8vw,0.6rem) 0;"></div>
+
+      <div class="two-col reveal reveal-delay-2" style="margin-top:var(--content-gap);">
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card card-cyan">
+            <div class="section-label">Análisis de correlaciones</div>
+            <ul class="step-list">
+              <li><span class="step-num">1</span><span>Sensores temperatura: alta correlación interna → <strong style="color:var(--cyan)">solo sensor #4</strong> (centro del aula)</span></li>
+              <li><span class="step-num">2</span><span>Sensores humedad: análisis idéntico para reducir redundancia</span></li>
+              <li><span class="step-num">3</span><span>Ventana 11 excluida tras Oct 2025 (lecturas erróneas)</span></li>
+            </ul>
+          </div>
+          <div class="card card-magenta">
+            <div class="section-label">Encoding cíclico (temporal)</div>
+            <p>hora_sin / hora_cos · dia_semana_sin/cos · mes_sin/cos<br>
+            <span class="text-muted">Evita saltos discontinuos 23h→0h, diciembre→enero.</span></p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card">
+            <div class="section-label">Features modelo lineal (calefacción)</div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.4rem;">
+              <span class="tag tag-cyan">hora</span><span class="tag tag-cyan">temp_exterior</span><span class="tag tag-cyan">humedad_ext</span><span class="tag tag-cyan">presión</span><span class="tag tag-cyan">nubosidad</span><span class="tag tag-cyan">viento</span><span class="tag tag-cyan">azimut_sol</span><span class="tag tag-cyan">elevacion_sol</span><span class="tag tag-cyan">temp_aula</span><span class="tag tag-cyan">humedad_aula</span><span class="tag tag-magenta">+5 más</span>
+            </div>
+          </div>
+          <div class="card card-yellow">
+            <div class="section-label">Features red neuronal (derroche)</div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.4rem;">
+              <span class="tag tag-yellow">hora_sin/cos</span><span class="tag tag-yellow">dia_sin/cos</span><span class="tag tag-yellow">mes_sin/cos</span><span class="tag tag-yellow">temp_aula</span><span class="tag tag-yellow">temp_ext</span><span class="tag tag-yellow">humedad_aula</span><span class="tag tag-yellow">viento</span><span class="tag tag-yellow">nubosidad</span><span class="tag tag-yellow">sol_elevacion</span><span class="tag tag-yellow">% ventilación</span>
+            </div>
+            <p class="text-muted" style="margin-top:0.4rem;font-size:var(--small-size);"><strong style="color:var(--yellow)">13 features</strong> · sin columnas de estado de apertura (evita data leakage)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 5: MODELOS ===================== -->
+  <section class="slide" id="slide-5" data-index="4" aria-label="Modelos ML e IA">
+    <div class="orb orb-magenta orb-1 decorative"></div>
+    <div class="orb orb-cyan orb-2 decorative"></div>
+    <div class="slide-content">
+      <div class="section-label reveal">Fases B y C — Modelos</div>
+      <h2 class="reveal reveal-delay-1">Machine Learning <span class="text-cyan">&amp;</span> <span class="text-magenta">Red Neuronal</span></h2>
+      <div class="accent-line reveal reveal-delay-1" style="width:clamp(40px,8vw,80px);margin:clamp(0.3rem,0.8vw,0.6rem) 0;"></div>
+
+      <div class="two-col reveal reveal-delay-2" style="margin-top:var(--content-gap);">
+        <!-- Linear Model -->
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card card-cyan">
+            <div class="section-label">Modelo Lineal — Temperatura Calefacción</div>
+            <p style="margin-bottom:0.5rem;font-size:var(--small-size);color:var(--text-muted);">Regresión lineal · split temporal 80/20</p>
+            <div style="display:flex;gap:clamp(0.6rem,2vw,2rem);flex-wrap:wrap;">
+              <div class="metric"><span class="metric-value text-cyan">1.05</span><span class="metric-label">MAE (°C)</span></div>
+              <div class="metric"><span class="metric-value text-cyan">1.35</span><span class="metric-label">RMSE (°C)</span></div>
+              <div class="metric"><span class="metric-value" style="color:var(--text-muted);">0.13</span><span class="metric-label">R²</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-label">Función del modelo lineal</div>
+            <ul class="step-list">
+              <li><span class="step-num">1</span><span>Predice la temperatura del sensor de calefacción</span></li>
+              <li><span class="step-num">2</span><span>Aplica la máquina de estados (schedule + histéresis)</span></li>
+              <li><span class="step-num">3</span><span>Genera la columna <code style="color:var(--cyan);font-size:var(--small-size);">calefaccion_on_pred</code></span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- Neural Network -->
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card card-magenta">
+            <div class="section-label">Red Neuronal Keras — Derroche siguiente hora</div>
+            <p style="margin-bottom:0.5rem;font-size:var(--small-size);color:var(--text-muted);">Dense(128) → Dense(64) → Dense(1, sigmoid) · Umbral 0.40</p>
+            <div style="display:flex;gap:clamp(0.5rem,1.5vw,1.5rem);flex-wrap:wrap;align-items:flex-end;">
+              <div class="metric"><span class="metric-value text-magenta">82%</span><span class="metric-label">Recall</span></div>
+              <div class="metric"><span class="metric-value" style="color:var(--yellow);">0.52</span><span class="metric-label">F1-score</span></div>
+              <div class="metric"><span class="metric-value text-cyan">0.67</span><span class="metric-label">ROC-AUC</span></div>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <p class="cm-label">Matriz de confusión</p>
+                <div class="cm-grid">
+                  <div class="cm-cell cm-tn">21</div>
+                  <div class="cm-cell cm-fp">37</div>
+                  <div class="cm-cell cm-fn">5</div>
+                  <div class="cm-cell cm-tp">23</div>
+                </div>
+                <div class="cm-grid" style="margin-top:1px;">
+                  <p class="cm-label">TN&nbsp;&nbsp;FP</p>
+                  <p class="cm-label">FN&nbsp;&nbsp;TP</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-yellow">
+            <div class="section-label">Decisión de umbral</div>
+            <p>Umbral optimizado en <strong style="color:var(--yellow);">0.40</strong> (mejor F1 en validación).<br>
+            Dataset desbalanceado → priorizamos <strong style="color:var(--magenta);">alto recall</strong> para no perder alertas de derroche.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SLIDE 6: DASHBOARD + CONCLUSIONES ===================== -->
+  <section class="slide" id="slide-6" data-index="5" aria-label="Dashboard y Conclusiones">
+    <div class="orb orb-cyan orb-1 decorative"></div>
+    <div class="orb orb-magenta orb-2 decorative"></div>
+    <div class="slide-content">
+      <div class="section-label reveal">Fase D — Dashboard &amp; Conclusiones</div>
+      <h2 class="reveal reveal-delay-1">Resultados y<br><span class="text-cyan">Propuestas de mejora</span></h2>
+      <div class="accent-line reveal reveal-delay-1" style="width:clamp(40px,8vw,80px);margin:clamp(0.3rem,0.8vw,0.6rem) 0;"></div>
+
+      <div class="two-col reveal reveal-delay-2" style="margin-top:var(--content-gap);">
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card card-cyan">
+            <div class="section-label">Dashboard Grafana (Fase D)</div>
+            <ul class="step-list">
+              <li><span class="step-num">·</span><span>Serie temporal de temperatura por sensor</span></li>
+              <li><span class="step-num">·</span><span>Gauge con temperatura media actual</span></li>
+              <li><span class="step-num">·</span><span>Variable selector de sensor (dropdown)</span></li>
+            </ul>
+            <div class="rule"></div>
+            <p class="text-muted" style="font-size:var(--small-size);">Conectado a TimescaleDB (tabla ltss) · Docker Compose</p>
+          </div>
+          <div class="card card-magenta">
+            <div class="section-label">App CLI de predicción</div>
+            <p>Introduce fecha + valores de sensores y obtén:</p>
+            <p style="color:var(--cyan);font-family:'Clash Display',sans-serif;margin-top:0.3rem;">¿Habrá derroche en la siguiente hora?</p>
+            <p class="text-muted" style="font-size:var(--small-size);margin-top:0.3rem;">scripts/app_predict_derroche.py</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+          <div class="card">
+            <div class="section-label">Logros del proyecto</div>
+            <ul class="step-list">
+              <li><span class="step-num" style="background:var(--cyan);color:var(--bg);">✓</span><span>Pipeline Medallion end-to-end reproducible</span></li>
+              <li><span class="step-num" style="background:var(--cyan);color:var(--bg);">✓</span><span>Modelo ML lineal · Modelo IA (Keras) entrenados</span></li>
+              <li><span class="step-num" style="background:var(--cyan);color:var(--bg);">✓</span><span>Definición rigurosa de derroche con pesos físicos</span></li>
+              <li><span class="step-num" style="background:var(--cyan);color:var(--bg);">✓</span><span>Dashboard Grafana funcional en tiempo real</span></li>
+            </ul>
+          </div>
+          <div class="card card-yellow">
+            <div class="section-label">Propuestas de mejora</div>
+            <ul class="step-list">
+              <li><span class="step-num yel">→</span><span>Ampliar dataset (más meses, otras aulas)</span></li>
+              <li><span class="step-num yel">→</span><span>Alertas automáticas en Grafana al predecir derroche</span></li>
+              <li><span class="step-num yel">→</span><span>Modelo LSTM para capturar patrones temporales</span></li>
+              <li><span class="step-num yel">→</span><span>Reentrenamiento periódico con datos nuevos</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== SLIDE 7: AGRADECIMIENTO ===================== -->
+  <section class="slide" id="slide-7" data-index="6" aria-label="Gracias">
+    <div class="orb orb-cyan decorative" style="width:60vw;height:60vw;top:-20%;right:-15%;"></div>
+    <div class="orb orb-magenta decorative" style="width:40vw;height:40vw;bottom:-15%;left:-10%;"></div>
+    <div class="orb orb-blue decorative" style="width:30vw;height:30vw;top:30%;left:30%;"></div>
+    <div class="slide-content" style="justify-content:center;align-items:center;text-align:center;">
+      <div class="reveal" style="margin-bottom:clamp(0.5rem,1.5vw,1.2rem);">
+        <span class="tag tag-cyan">BDA · 2025 – 2026</span>
+      </div>
+      <h1 class="reveal reveal-delay-1" style="font-size:clamp(3rem,12vw,9rem);line-height:1;letter-spacing:-0.04em;">
+        <span class="text-cyan">Gracias</span>
+      </h1>
+      <div class="accent-line reveal reveal-delay-2" style="width:clamp(60px,18vw,200px);margin:clamp(0.6rem,1.5vw,1.5rem) auto;"></div>
+      <p class="reveal reveal-delay-3" style="font-size:var(--h3-size);color:var(--text-muted);max-width:45ch;margin:0 auto clamp(1rem,2.5vw,2.5rem);">
+        Proyecto de Eficiencia Energética del Aula<br>
+        <span style="color:var(--text);">Domótica + IA para reducir el derroche de calefacción</span>
+      </p>
+      <div class="reveal reveal-delay-4" style="display:flex;gap:clamp(0.6rem,2vw,1.5rem);flex-wrap:wrap;justify-content:center;">
+        <span class="tag tag-magenta">¿Preguntas?</span>
+        <span class="tag tag-cyan">github · Proyecto-Domotica</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* =============================================
+   PRESENTATION CONTROLLER
+   ============================================= */
+class PresentationController {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.dots = Array.from(document.querySelectorAll('.nav-dot'));
+    this.progress = document.getElementById('progress');
+    this.current = 0;
+    this.total = this.slides.length;
+    this.scrolling = false;
+    this.touchStartY = 0;
+
+    this._setupIntersectionObserver();
+    this._setupKeyboard();
+    this._setupWheel();
+    this._setupTouch();
+    this._setupDots();
+    this._updateProgress(0);
+  }
+
+  _setupIntersectionObserver() {
+    // Slide entry detection
+    const slideObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = parseInt(entry.target.dataset.index);
+          this.current = idx;
+          this._updateDots(idx);
+          this._updateProgress(idx);
+          // Trigger reveal animations
+          entry.target.querySelectorAll('.reveal').forEach(el => {
+            el.classList.add('visible');
+          });
+        }
+      });
+    }, { threshold: 0.55 });
+
+    this.slides.forEach(s => slideObserver.observe(s));
+  }
+
+  _updateDots(idx) {
+    this.dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  _updateProgress(idx) {
+    const pct = this.total > 1 ? (idx / (this.total - 1)) * 100 : 100;
+    this.progress.style.width = pct + '%';
+  }
+
+  goTo(idx) {
+    const target = this.slides[Math.max(0, Math.min(this.total - 1, idx))];
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  next() { this.goTo(this.current + 1); }
+  prev() { this.goTo(this.current - 1); }
+
+  _setupKeyboard() {
+    document.addEventListener('keydown', e => {
+      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.next(); }
+      if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+      if (e.key === 'Home') { e.preventDefault(); this.goTo(0); }
+      if (e.key === 'End') { e.preventDefault(); this.goTo(this.total - 1); }
+      const num = parseInt(e.key);
+      if (!isNaN(num) && num >= 1 && num <= this.total) this.goTo(num - 1);
+    });
+  }
+
+  _setupWheel() {
+    document.addEventListener('wheel', e => {
+      if (this.scrolling) return;
+      this.scrolling = true;
+      if (e.deltaY > 0) this.next(); else this.prev();
+      setTimeout(() => { this.scrolling = false; }, 900);
+    }, { passive: true });
+  }
+
+  _setupTouch() {
+    document.addEventListener('touchstart', e => {
+      this.touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', e => {
+      const dy = this.touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) > 50) { if (dy > 0) this.next(); else this.prev(); }
+    }, { passive: true });
+  }
+
+  _setupDots() {
+    this.dots.forEach((d, i) => {
+      d.addEventListener('click', () => this.goTo(i));
+    });
+  }
+}
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', () => {
+  new PresentationController();
+});
+</script>
+</body>
+</html>
