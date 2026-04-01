@@ -25,6 +25,6 @@ Classification report:
 weighted avg     0.6695    0.5116    0.5074        86
 
 
-Modelo guardado: C:\IABD\Poryectos Finales\Proyecto-Domotica\models\nn_derroche_model_keras.keras
-Prepro guardado: C:\IABD\Poryectos Finales\Proyecto-Domotica\models\nn_derroche_preprocess_keras.joblib
-Predicciones test: C:\IABD\Poryectos Finales\Proyecto-Domotica\data\gold\nn_derroche_predictions_keras.csv
+Modelo guardado: C:\Users\aodar\OneDrive\Desktop\clase\Proyecto-Domotica\models\nn_derroche_model_keras.keras
+Prepro guardado: C:\Users\aodar\OneDrive\Desktop\clase\Proyecto-Domotica\models\nn_derroche_preprocess_keras.joblib
+Predicciones test: C:\Users\aodar\OneDrive\Desktop\clase\Proyecto-Domotica\data\gold\nn_derroche_predictions_keras.csv

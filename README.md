@@ -1,8 +1,8 @@
 # Domótica — Analítica e IA (derroche de calefacción)
 
-Proyecto de **eficiencia energética en aula**: a partir de datos horarios (Home Assistant / PostgreSQL) se construye un dataset, se define **derroche** con reglas claras y se entrena un modelo que estima si habrá derroche en la **siguiente hora**.
+Proyecto de eficiencia energética orientado a detectar derroche en la siguiente hora con una arquitectura Medallion simplificada.
 
-## Qué problema aborda
+## Estado actual (resumen rápido)
 
 ¿Qué problema queréis resolver?
 
@@ -29,6 +29,7 @@ La ventilación se calcula en SQL con **pesos** (ventana pequeña 1, grande 2, p
 - **Memoria técnica** y **manual 1 página**: carpeta `docs/entrega/` (`MEMORIA_TECNICA.md`, `MANUAL_1_PAGINA_PROFESOR.md`).
 - Detalle de tareas y trazabilidad: `docs/PROYECTO_ESTADO.md`. Arquitectura: `docs/ARQUITECTURA_MEDALLION.md`. Auditoría de reproducibilidad: `reports/AUDITORIA_REPRODUCIBILIDAD.md`.
 - **Cumplimiento vs PDF de asignatura:** `docs/COMPARATIVA_REQUISITOS_PDF.md`.
+- Scripts legacy: `archive/scripts/`.
 
 **Pendiente de la especificación de asignatura:** **presentación** de cierre; ver `docs/PROYECTO_ESTADO.md`. El dashboard **Grafana** (dos visualizaciones + selector de sensor) está en `grafana/` — ver `grafana/README.md`.
 
