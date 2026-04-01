@@ -1,0 +1,29 @@
+# Grafana apuntando al mismo PostgreSQL que el proyecto (tabla ltss).
+# Uso (desde esta carpeta):
+#   docker compose up -d
+# UI: http://localhost:3000  (admin / ver GF_SECURITY_ADMIN_PASSWORD abajo)
+#
+# Si PostgreSQL corre en el PC anfitrión y Grafana en Docker (Windows/Mac):
+#   en .env del repo, usa DB_HOST=host.docker.internal
+
+services:
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: grafana-domotica
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin1234
+      GF_SECURITY_ADMIN_PASSWORD: admin1234
+      GF_USERS_DEFAULT_THEME: light
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      # Si .env tiene DB_HOST=localhost pero PostgreSQL está en el PC anfitrión, descomenta:
+      DB_HOST: host.docker.internal
+    env_file:
+      - ../.env
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

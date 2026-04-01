@@ -102,7 +102,7 @@ El documento de partida describe un despliegue concreto (p. ej. host de base de 
 
 ## 10. Limitaciones y trabajo pendiente fuera del núcleo ML
 
-- **Dashboard Grafana** (visualizaciones + selector): pendiente de montar según especificación.  
+- **Dashboard Grafana** (visualizaciones + selector): carpeta `grafana/` (serie temporal, gauge de media, variable sensor sobre `ltss`).  
 - **Presentación** de cierre: material aparte.  
 - Tamaño del dataset IA tras filtros estrictos: depende del solapamiento History–SQL y de la clase positiva; conviene reportar métricas y matriz de confusión en la defensa.
 

@@ -100,7 +100,7 @@ O con hora suelta: `--hora 14 --dia-semana 3 --mes 12` (día 0=Lunes…6=Domingo
 ## Estado de entrega
 
 - Fase A/B/C: implementadas en código y dataset.
-- Fase D (dashboard Grafana): pendiente.
+- Fase D (dashboard Grafana): implementado en `grafana/` (Docker + import JSON).
 - Presentación de cierre: pendiente.
 - Memoria técnica: [`MEMORIA_TECNICA.md`](MEMORIA_TECNICA.md) (esta carpeta `docs/entrega/`).
 

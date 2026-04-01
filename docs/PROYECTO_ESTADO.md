@@ -87,8 +87,8 @@
 
 ## Fase D - Dashboard
 
-- **Dashboard en Grafana con min. 2 visualizaciones + selector sensor:** **PENDIENTE**
-  - No se detectan artefactos/configuracion de Grafana en el repositorio actual.
+- **Dashboard en Grafana con min. 2 visualizaciones + selector sensor:** **HECHO**
+  - Artefactos en `grafana/`: `docker-compose.yml`, provisioning PostgreSQL (`provisioning/datasources/`), dashboard JSON `dashboards/domotica-temperatura.json` (serie temporal + gauge de media + variable sensor). Instrucciones: `grafana/README.md`.
 
 ## 5) Modelos y artefactos ya generados
 
@@ -114,13 +114,12 @@
 - Scripts SQL/Python de extraccion y agregacion: **HECHO**.
 - Modelo ML lineal entrenado + metricas: **HECHO**.
 - Red neuronal entrenada + metricas: **HECHO**.
-- Dashboard funcional (Grafana/HA/Timescale): **PENDIENTE**.
+- Dashboard funcional (Grafana/HA/Timescale): **HECHO** (Grafana en `grafana/`).
 - Presentacion 5-8 diapositivas: **PENDIENTE**.
 
 ## 7) Proximos pasos (orden recomendado para cumplir PDF)
 
-1. Montar dashboard Grafana con los minimos exigidos (2 visualizaciones + selector sensor).
-2. Mejorar T11 de app CLI a app web (opcional pero recomendable para defensa).
+1. Mejorar T11 de app CLI a app web (opcional pero recomendable para defensa).
 3. Presentacion 5-8 diapositivas con evidencia (metricas, consultas, graficas); memoria tecnica en `docs/entrega/MEMORIA_TECNICA.md`.
 
 ## 8) Flujo operativo actual (comando único)

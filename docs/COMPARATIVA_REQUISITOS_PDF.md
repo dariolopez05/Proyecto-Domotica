@@ -25,7 +25,7 @@ Leyenda: **Cumple** | **Parcial / interpretación** | **No implementado / gap**
 | Analizar correlaciones (optimizar sensores) | **Cumple** (scripts en `archive/scripts/`, informes humedad/temperatura). |
 | Detectar/predicir si la calefacción está encendida | **Cumple** (`calefaccion_on_normas_history`, `calefaccion_on_pred`). |
 | Modelo ML + modelo IA | **Cumple** (lineal + Keras). |
-| **Dashboard** tiempo real e histórico | **No implementado** (Grafana pendiente; ver `PROYECTO_ESTADO.md`). |
+| **Dashboard** tiempo real e histórico | **Cumple** (Grafana + `ltss`; carpeta `grafana/`). |
 
 ---
 
@@ -38,7 +38,7 @@ Leyenda: **Cumple** | **Parcial / interpretación** | **No implementado / gap**
 | **Notebooks** tipo `01_eda.ipynb` … `05_evaluation.ipynb` (estructura ejemplo) | **No replicado** tal cual: el flujo está en scripts Python; no hay carpeta `notebooks/` obligatoria con esa numeración. |
 | Modelo ML + métricas | **Cumple** (`models/heating_linear_model.joblib`, `reports/heating_linear_model_metrics.txt`). |
 | Red neuronal + métricas | **Cumple** (`models/nn_derroche_model_keras.keras`, `reports/nn_derroche_metrics_keras.txt`). |
-| **Dashboard funcional** HA/TimescaleDB + visualizaciones | **No implementado** (sin carpeta `dashboard/` ni Grafana en repo). |
+| **Dashboard funcional** HA/TimescaleDB + visualizaciones | **Cumple** (Grafana provisionado en `grafana/`; datasource PostgreSQL / `ltss`). |
 | Presentación 5–8 diapos | **Pendiente** (material fuera del repo o por añadir). |
 | Estructura repo ejemplo (`bronze/silver/gold`, `sql/01_...`) | **Parcial**: hay `data/bronze`, `data/gold`; **no hay capa Silver** explícita; SQL principal en `queries/` no en `sql/` con ese numerado. |
 
@@ -105,15 +105,14 @@ El PDF sugiere además quitar columnas que generen ruido; el proyecto **omite** 
 
 | Requisito PDF | Estado en el proyecto |
 |----------------|------------------------|
-| Mínimo 2 visualizaciones (serie temporal temperatura; gauge temperatura media) | **No implementado**. |
-| Variable para **seleccionar sensor** de temperatura | **No implementado**. |
+| Mínimo 2 visualizaciones (serie temporal temperatura; gauge temperatura media) | **Cumple** (`grafana/dashboards/domotica-temperatura.json`; Docker en `grafana/docker-compose.yml`). |
+| Variable para **seleccionar sensor** de temperatura | **Cumple** (variable de consulta sobre `ltss`; ver `grafana/README.md`). |
 
 ---
 
 ## 9. Resumen de gaps respecto al PDF (accionables)
 
-1. **Dashboard Grafana** (Fase D completa).  
-2. **Presentación** 5–8 diapos.  
+1. **Presentación** 5–8 diapos. (Fase D Grafana: ver `grafana/`.)  
 3. **Documento técnico en PDF** si el centro exige formato PDF explícito (contenido ya en memoria Markdown).  
 4. **Consumo eléctrico (Shelly)** no integrado en datos ni modelos.  
 5. **CSV final IA**: **hora, día de semana y mes** están cubiertos como **features cíclicas** (`*_sin`/`*_cos`). Pueden faltar aún **presión** y otros campos del master si se quiere paridad con el enunciado literal. **Calefacción on** sigue siendo filtro de export, no feature.  

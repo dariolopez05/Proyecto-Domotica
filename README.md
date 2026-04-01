@@ -30,7 +30,7 @@ La ventilación se calcula en SQL con **pesos** (ventana pequeña 1, grande 2, p
 - Detalle de tareas y trazabilidad: `docs/PROYECTO_ESTADO.md`. Arquitectura: `docs/ARQUITECTURA_MEDALLION.md`. Auditoría de reproducibilidad: `reports/AUDITORIA_REPRODUCIBILIDAD.md`.
 - **Cumplimiento vs PDF de asignatura:** `docs/COMPARATIVA_REQUISITOS_PDF.md`.
 
-**Pendiente de la especificación de asignatura:** dashboard **Grafana** (mínimo dos visualizaciones + selector) y **presentación** de cierre; ver `docs/PROYECTO_ESTADO.md`.
+**Pendiente de la especificación de asignatura:** **presentación** de cierre; ver `docs/PROYECTO_ESTADO.md`. El dashboard **Grafana** (dos visualizaciones + selector de sensor) está en `grafana/` — ver `grafana/README.md`.
 
 ## Requisitos
 
@@ -58,6 +58,10 @@ Si PostgreSQL no está disponible, `build_gold_dataset` puede usar un CSV Gold p
 Copia `.env.example` a `.env` y ajusta host, puerto (p. ej. 5432), base de datos (p. ej. `postgres`), usuario y contraseña. La query principal usa la tabla **`ltss`**. Más detalle: `scripts/README_MASTER_QUERY.md`.
 
 El entorno de la memoria PDF de asignatura puede describir otro host; el desarrollo ha sido con **PostgreSQL local** y la misma lógica de consultas.
+
+## Grafana (Fase D)
+
+Configuración y dashboard provisionados: carpeta **`grafana/`** (`docker compose up` desde ahí). Usa la misma tabla **`ltss`** y credenciales del `.env` del repo.
 
 ## Predicción manual (CLI)
 
