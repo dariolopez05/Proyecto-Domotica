@@ -10,8 +10,8 @@
 
 Se considera derroche cuando:
 
-- la calefacción está encendida (`calefaccion_on_pred = 1`)
-- y la ventilación ponderada supera el 15% (`porcentaje_ventilacion_aula > 15`)
+- la calefacción está encendida según normas sobre temperatura History (`calefaccion_on_normas_history = 1`)
+- y la ventilación ponderada es **estrictamente mayor al 15 %** (`porcentaje_ventilacion_aula > 15`)
 
 Objetivo de IA:
 
@@ -101,8 +101,9 @@ python scripts/app_predict_derroche.py --hora 14 --temp-aula ... --temp-ext ... 
 
 - Fase A/B/C: implementadas en código y dataset.
 - Fase D (dashboard Grafana): pendiente.
-- Presentación y memoria técnica final: pendiente de cierre documental.
+- Presentación de cierre: pendiente.
+- Memoria técnica: [`MEMORIA_TECNICA.md`](MEMORIA_TECNICA.md) (esta carpeta `docs/entrega/`).
 
-Referencia de estado detallado:
+Referencia de estado detallado del proyecto:
 
-- `docs/PROYECTO_ESTADO.md`
+- [`../PROYECTO_ESTADO.md`](../PROYECTO_ESTADO.md)

@@ -1,138 +1,102 @@
-# Domótica — Proyecto de analítica/IA
+# Domótica — Analítica e IA (derroche de calefacción)
 
-Proyecto de eficiencia energética orientado a detectar derroche en la siguiente hora con una arquitectura Medallion simplificada.
+Proyecto de **eficiencia energética en aula**: a partir de datos horarios (Home Assistant / PostgreSQL) se construye un dataset, se define **derroche** con reglas claras y se entrena un modelo que estima si habrá derroche en la **siguiente hora**.
 
-## Estado actual (resumen rápido)
+## Qué problema aborda
 
-- Capa Gold unificada en `data/gold/master_dataset.csv`.
-- Dataset final IA en `data/gold/dataset_final_ia.csv`.
-- Modelo lineal para temperatura de calefacción y red neuronal para derroche entrenados.
-- Scripts legacy movidos a `archive/scripts/`.
-- Estado detallado y trazabilidad: `docs/PROYECTO_ESTADO.md`.
-- Guía de arquitectura y flujo: `docs/ARQUITECTURA_MEDALLION.md`.
-- Manual breve para presentación: `docs/MANUAL_1_PAGINA_PROFESOR.md`.
-- Auditoría técnica final: `docs/AUDITORIA_REPRODUCIBILIDAD.md`.
+¿Qué problema queréis resolver?
 
-## Pipeline operativo
+- **Derroche** por ventanas/puerta abiertas mientras la calefacción está encendida según criterio operativo.
 
-Ejecutar extremo a extremo:
+¿Qué predice el modelo?
+
+- **`target_derroche_next_hour`**: si en la hora siguiente se cumple la condición de derroche definida abajo.
+
+**Definición de derroche (criterio único en código):**
+
+- Calefacción encendida según **normas de temperatura** aplicadas al CSV **History** (bronze), columna `calefaccion_on_normas_history` (ver `utils/heating_normas.py`).
+- Y **`porcentaje_ventilacion_aula` > 15 %** (umbral fijado en `utils/config.py` como `DERROCHE_VENTILATION_THRESHOLD_PCT = 15.0`).
+
+La ventilación se calcula en SQL con **pesos** (ventana pequeña 1, grande 2, puerta 4, divisor 20) — `queries/master_query.sql`.
+
+## Estado del desarrollo
+
+- **Gold** unificado: `data/gold/master_dataset.csv`.
+- **Dataset IA** (filas con calefacción on según normas; features con posibles NaN, imputación en el entrenamiento): `data/gold/dataset_final_ia.csv`.
+- **Modelos:** regresión lineal (temperatura calefacción) + red neuronal **Keras** (derroche).
+- **CLI de predicción:** `scripts/app_predict_derroche.py` (recomendado `--hora 0-23`).
+- **Informe HTML** de datos: `python scripts/generate_data_report.py` → `reports/informe_datos_gold.html`.
+- **Memoria técnica** y **manual 1 página**: carpeta `docs/entrega/` (`MEMORIA_TECNICA.md`, `MANUAL_1_PAGINA_PROFESOR.md`).
+- Detalle de tareas y trazabilidad: `docs/PROYECTO_ESTADO.md`. Arquitectura: `docs/ARQUITECTURA_MEDALLION.md`. Auditoría de reproducibilidad: `reports/AUDITORIA_REPRODUCIBILIDAD.md`.
+
+**Pendiente de la especificación de asignatura:** dashboard **Grafana** (mínimo dos visualizaciones + selector) y **presentación** de cierre; ver `docs/PROYECTO_ESTADO.md`.
+
+## Requisitos
+
+- Python 3.10+ recomendado.
+- Dependencias: `pip install -r requirements.txt` (incluye `pandas`, `scikit-learn`, `tensorflow-cpu`, `psycopg2-binary`, `python-dotenv`, etc.).
+
+## Pipeline de punta a punta
 
 ```bash
 python scripts/run_pipeline.py
 ```
 
-Pasos internos:
-1. Construcción Gold (`build_gold_dataset.py`)
-2. Entrenamiento lineal calefacción (`train_linear_heating_model.py`)
-3. Rebuild Gold con columna lineal
-4. Export dataset final IA (`export_final_ia_dataset.py`)
-5. Entrenamiento red neuronal (Keras) (`train_nn_derroche_model_keras.py`)
+Orden interno:
 
-## Conexión a PostgreSQL
+1. `build_gold_dataset.py` — SQL → Gold + normas History + derroche + target.
+2. `train_linear_heating_model.py` — modelo lineal y columna `temp_calefaccion_lineal` en el master.
+3. `build_gold_dataset.py` — reconstruye Gold con esa columna.
+4. `export_final_ia_dataset.py` — `dataset_final_ia.csv` (solo calefacción on).
+5. `train_nn_derroche_model_keras.py` — entrena y guarda modelo + preprocesado.
 
-Copia `.env.example` a `.env` y configura host, puerto, base de datos (p. ej. `postgres`), usuario y contraseña. La consulta Gold usa la tabla `ltss`. Más detalle en `scripts/README_MASTER_QUERY.md`.
+Si PostgreSQL no está disponible, `build_gold_dataset` puede usar un CSV Gold previo como respaldo (ver script).
 
-## Objetivos
+## Conexión a base de datos
 
-¿Qué problema vais a resolver?
-- El problema a resolver es el derroche energético en calefacción en el centro educativo por culpa de ventanas/puertas abiertas mientras la calefacción está encendida
+Copia `.env.example` a `.env` y ajusta host, puerto (p. ej. 5432), base de datos (p. ej. `postgres`), usuario y contraseña. La query principal usa la tabla **`ltss`**. Más detalle: `scripts/README_MASTER_QUERY.md`.
 
-¿Qué queréis predecir o detectar?
-- El objetivo es usar los datos de temperatura que recogemos a lo largo de una hora para predecir si en la siguiente hora las ventanas van a ser abiertas o no
+El entorno de la memoria PDF de asignatura puede describir otro host; el desarrollo ha sido con **PostgreSQL local** y la misma lógica de consultas.
 
-¿Cuál será el target del modelo?
+## Predicción manual (CLI)
 
-## Estructura
+Ejemplo con hora legible:
 
-```text
-Domotica/
-├─ README.md
-├─ .gitignore
-├─ .gitattributes
-├─ docs/
-│  ├─ README.md
-│  ├─ memoria_tecnica.pdf          # colocar aquí (no se genera automáticamente)
-│  ├─ decisiones_arquitectura.md
-│  └─ anexos/
-│     └─ README.md
-├─ presentacion/
-│  └─ README.md                    # colocar aquí la presentación final (PDF/PPTX)
-├─ archive/bi/                      # opcional (Power BI, archivado)
-│  ├─ README.md                    # dashboard + notas
-│  ├─ dashboard.pbix               # opcional (Power BI)
-│  └─ assets/
-│     └─ .gitkeep
-├─ datasets/
-│  ├─ README_datasets.md
-│  ├─ raw/                         # ingesta tal cual llega (normalmente ignorado en git)
-│  │  └─ .gitkeep
-│  ├─ cleaned/                     # limpio/normalizado (granularidad original)
-│  │  └─ .gitkeep
-│  └─ curated/                     # features/tabla final (p.ej. por hora)
-│     └─ .gitkeep
-├─ pipelines/
-│  ├─ README.md
-│  └─ sql/
-│     ├─ 10_ingesta_raw.sql
-│     ├─ 20_limpieza_cleaned.sql
-│     └─ 30_features_curated_hourly.sql
-├─ notebooks/
-│  └─ README.md                    # lista de notebooks y propósito
-├─ src/
-│  └─ README.md                    # código reusable (ETL/features/modelos)
-├─ artifacts/
-│  ├─ README.md
-│  ├─ models/
-│  │  └─ .gitkeep
-│  └─ reports/
-│     └─ metrics.json
-└─ requirements.txt                # opcional (si usas Python)
+```bash
+python scripts/app_predict_derroche.py --hora 14 --temp-aula 22 --temp-ext 15 --humedad-aula 50 --viento 10 --nubosidad 40 --sol-elevacion 20 --porcentaje-ventilacion-aula 10
 ```
 
-## Notas
+Hace falta tener entrenados `models/nn_derroche_model_keras.keras` y `models/nn_derroche_preprocess_keras.joblib`.
 
-- Si vas a versionar datos, hazlo solo en `datasets/cleaned` o `datasets/curated` y siempre sin información sensible.
-- Los binarios pesados (PBIX, PDFs, modelos) pueden mantenerse en el repo si el tamaño lo permite, o gestionarse con releases/almacenamiento externo.
+## Estructura relevante del repositorio
 
-# Indicaciones adicionales
+```text
+Proyecto-Domotica/
+├── README.md
+├── requirements.txt
+├── .env.example
+├── queries/
+│   └── master_query.sql
+├── scripts/              # pipeline, export, entrenamiento, app, informe
+├── utils/                # config, db, preprocessing, normas calefacción
+├── data/
+│   ├── bronze/           # History CSV (temperatura normas / lineal)
+│   └── gold/             # master_dataset, dataset_final_ia, predicciones
+├── models/               # joblib + .keras
+├── reports/              # métricas, informe HTML, auditoría reproducibilidad
+├── docs/
+│   ├── entrega/          # memoria técnica + manual 1 página (profesor)
+│   ├── ARQUITECTURA_MEDALLION.md
+│   └── PROYECTO_ESTADO.md
+└── archive/              # scripts y artefactos legacy
+```
 
-- Los sensores de temperatura de las ventanas no hay que usarlos
-- Buscar el coeficiente de correlacion entre los 4 sensores de temperatura internos para decidir con cual nos quedamos
-- El csv con temperaturas mide las de un aula distinta a la nuestra en la misma ala del instituto
-- Vamos a eliminar el sensor de la ventana 11 ya que dejó de funcionar en octubre de 2025 y proporciona lectura erroneas a partir de ese momento
-- Las ventanas pares son las pequeñas (superiores), las grandes son las impares (inferiores) y vamos a tener en cuenta que cada ventana pequeña cuenta como 1 (unidad de medida mínima) con lo cual cada ventana grande cuenta como 2
+## Indicaciones que han guiado el análisis (resumen)
 
-# Proceso de desarrollo
-### Carga y filtrado de datos
-- Carga de datos en postgres con los scripts Creacion y Descarga
-- Selección de las entity_ids que resultaban útiles para el problema a tratar
-- Consulta SQL para extracción de atributos de la columna en formato Json (friendly_name, device_class y unit_of_measurement)
+- Sensores de temperatura en ventanas descartados para el foco del aula; correlación entre sensores internos llevó a quedarse con el **sensor 4** (centro).
+- Ventanas **pares** = pequeñas (superiores), **impares** = grandes (inferiores); la ventana 11 dejó de ser fiable y se excluye de la lógica agregada.
+- CSV de History de otra aula en la misma ala: se usa donde encaja con el uso pedagógico; el **master** horario viene de **vuestra** agregación SQL.
 
-### Cálculo de tiempo de apertura
-- Desarrollo de una consulta SQL para filtrar y agrupar por hora las entidades cuyo estado es cerrado (off) o abierto (on) sumando el tiempo total de apertura por hora, y después agrupando las entidades con una funcion ventana para obtener una suma del tiempo de apertura conjunto de todas las ventanas
+## To-do propio del repo (baja prioridad)
 
-### Cálculo de temperaturas
-- Desarrollo de una consulta SQL para filtrar y agrupar por hora las temperaturas y humedad de los sensores haciendo una media de sus valores
-
-### Selección de sensores
-- Desarrollo de un script python para calcular la correlacion entre los diferentes sensores de temperatura del aula y sus gráficos asociados.
-
-- El diagnóstico final ha sido mantener unicamente el sensor 4 (centro del aula), ya que los sensores 2 (ventana) y 3 (puerta) sufrian variaciones de temperatura ligeramente más marcadas debido a la apertura de las mismas y el sensor 1 (esquina) tenía una correlación del 99.9% con el central, con lo cual ofrecía información redundante
-
-### Regresión de Temperatura
-- Desarrollar un modelo de regresion lineal para predecir la temperatura de la calefacción (que decide si está encendida o no) para averiguar según el algoritmo de encendido/apagado el estado actual de la calefacción
-
-### Sensores/Agrupaciones
-temperatura-media
-humedad-media
-nubosidad-media
-presión-media
-viento-moda
-dirección viento-moda
-azimuth solar-mediana
-elevación solar-mediana
-forecast-último valor
-
-# To-Do list
-- Refactor del script de correlacion de sensores para automatizar la creacion de csv mediante consulta sql "media_temperature"
-- Explorar métodos de automatización de limpieza de datos con python, posible cambio a python o integración con los sql existentes
+- Automatizar más el flujo de correlación de sensores si hiciera falta replicar análisis antiguos (`archive/scripts/`).

@@ -6,8 +6,8 @@ Este proyecto busca predecir si habrá **derroche energético en la siguiente ho
 
 Derroche se define como:
 
-- `calefaccion_on_pred == 1`
-- y `porcentaje_ventilacion_aula > 15`
+- `calefaccion_on_normas_history == 1` (si existe; si no, `calefaccion_on_pred == 1`)
+- y `porcentaje_ventilacion_aula > 15` (umbral fijado en `utils/config.py`)
 
 Después se crea el target futuro:
 

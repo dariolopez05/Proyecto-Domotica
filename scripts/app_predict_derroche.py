@@ -49,7 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--viento", type=float, required=True)
     parser.add_argument("--nubosidad", type=float, required=True)
     parser.add_argument("--sol-elevacion", type=float, required=True)
-    parser.add_argument("--porcentaje-ventilacion-aula", type=float, required=True)
+    parser.add_argument("--porcentaje-ventilacion-aula", type=float, required=True) 
     return parser.parse_args()
 
 
