@@ -28,6 +28,20 @@ _model = None
 _pre = None
 
 
+def _is_in_heating_schedule(hora: int, dia_semana: int) -> bool:
+    """Horario activo de calefaccion: Lun-Vie y franjas configuradas."""
+    if dia_semana >= 5:
+        return False
+    t = hora * 60
+    slots = [
+        (7 * 60 + 6, 11 * 60),
+        (11 * 60 + 1, 16 * 60),
+        (16 * 60 + 1, 18 * 60),
+        (18 * 60 + 1, 20 * 60 + 40),
+    ]
+    return any(start <= t <= end for start, end in slots)
+
+
 def _load_assets():
     global _model, _pre
     if _pre is None:
@@ -53,12 +67,29 @@ def predict():
         data = request.get_json(force=True)
 
         hora = int(data["hora"])
+        dia_semana = int(data.get("dia_semana", 0))  # 0=Lun ... 6=Dom
+        mes = int(data.get("mes", 1))  # 1..12
+
+        if not _is_in_heating_schedule(hora, dia_semana):
+            return jsonify({
+                "ok": False,
+                "error": "Prediccion no disponible fuera del horario de calefaccion (Lun-Vie, 07:06-20:40 por franjas).",
+            }), 400
+
         hora_sin = math.sin(2 * math.pi * hora / 24)
         hora_cos = math.cos(2 * math.pi * hora / 24)
+        dia_semana_sin = math.sin(2 * math.pi * dia_semana / 7)
+        dia_semana_cos = math.cos(2 * math.pi * dia_semana / 7)
+        mes_sin = math.sin(2 * math.pi * (mes - 1) / 12)
+        mes_cos = math.cos(2 * math.pi * (mes - 1) / 12)
 
         row = {
             "hora_sin": hora_sin,
             "hora_cos": hora_cos,
+            "dia_semana_sin": dia_semana_sin,
+            "dia_semana_cos": dia_semana_cos,
+            "mes_sin": mes_sin,
+            "mes_cos": mes_cos,
             "temp_aula": float(data["temp_aula"]),
             "temp_ext": float(data["temp_ext"]),
             "humedad_aula": float(data["humedad_aula"]),
@@ -87,6 +118,10 @@ def predict():
             "threshold": round(threshold * 100, 2),
             "hora_sin": round(hora_sin, 4),
             "hora_cos": round(hora_cos, 4),
+            "dia_semana_sin": round(dia_semana_sin, 4),
+            "dia_semana_cos": round(dia_semana_cos, 4),
+            "mes_sin": round(mes_sin, 4),
+            "mes_cos": round(mes_cos, 4),
         })
 
     except Exception as exc:

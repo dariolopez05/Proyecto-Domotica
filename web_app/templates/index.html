@@ -284,6 +284,68 @@
     .thr-line  { position: absolute; top: -3px; width: 2px; height: 11px; background: rgba(255,255,255,.35); border-radius: 1px; }
     .thr-line::after { content: 'umbral'; position: absolute; top: 13px; left: 50%; transform: translateX(-50%); font-size: 7px; color: var(--text-dim); white-space: nowrap; letter-spacing: .08em; }
 
+    /* ─── Fecha (dia + mes) ──────────────────────────────────────── */
+    .fecha-row { display: flex; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); align-items: stretch; }
+    .fecha-block { background: var(--panel-alt); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; flex: 1; }
+    .fecha-block-label { font-size: 9px; letter-spacing: .13em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+
+    .day-btns { display: flex; gap: 3px; flex-wrap: wrap; }
+    .day-btn {
+      flex: 1; min-width: 28px; padding: 5px 2px; text-align: center;
+      background: transparent; border: 1px solid var(--border); border-radius: 4px;
+      font-family: var(--head); font-size: 9px; font-weight: 600; letter-spacing: .06em;
+      color: var(--text-dim); cursor: pointer; transition: all .15s;
+    }
+    .day-btn:hover { border-color: var(--border-glow); color: var(--text); }
+    .day-btn.active { background: var(--amber-glow); border-color: var(--amber); color: var(--amber); }
+    .day-btn.weekend { opacity: .45; }
+    .day-btn.weekend.active { background: rgba(100,116,139,.15); border-color: #475569; color: var(--text-dim); }
+
+    .mes-select {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: var(--text-bright); font-family: var(--head); font-size: 14px; font-weight: 600;
+      cursor: pointer; -webkit-appearance: none;
+    }
+    .mes-select option { background: #0d1424; color: var(--text-bright); }
+
+    /* ─── Schedule status pill ───────────────────────────────────── */
+    .schedule-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: 4px; border: 1px solid;
+      font-size: 9px; letter-spacing: .08em; text-transform: uppercase; font-family: var(--head);
+      transition: all .3s;
+    }
+    .schedule-pill.on  { color: var(--safe);   border-color: var(--safe-dim);   background: rgba(74,222,128,.07); }
+    .schedule-pill.off { color: #f59e0b;       border-color: #92400e;           background: rgba(245,158,11,.07); }
+    .schedule-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    /* ─── Modal ──────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(4,8,15,.82); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.visible { display: flex; animation: fadeIn .2s ease; }
+    .modal-box {
+      background: var(--panel); border: 1px solid var(--border-glow);
+      border-radius: 12px; padding: 32px 28px; max-width: 380px; width: 90%;
+      text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.6);
+      animation: slideUp .25s ease;
+    }
+    .modal-icon { margin-bottom: 14px; color: #f59e0b; }
+    .modal-title { font-family: var(--head); font-size: 16px; font-weight: 700; color: var(--text-bright); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+    .modal-body  { font-size: 12px; color: var(--text); line-height: 1.6; margin-bottom: 8px; }
+    .modal-schedule { font-size: 10px; color: var(--text-dim); background: var(--panel-alt); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 12px 0; text-align: left; line-height: 1.8; }
+    .modal-schedule strong { color: var(--text); }
+    .modal-close {
+      margin-top: 14px; padding: 10px 28px;
+      background: var(--border-glow); border: 1px solid var(--border-glow);
+      border-radius: 6px; font-family: var(--head); font-size: 11px;
+      font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text-bright); cursor: pointer; transition: background .2s;
+    }
+    .modal-close:hover { background: var(--border); }
+
     @media (max-width: 960px) {
       html, body { overflow: auto; }
       main { grid-template-columns: 1fr; }
@@ -317,9 +379,39 @@
       <div class="panel-header">
         <span class="ic ic-sm" style="color:var(--amber);"><i data-lucide="sliders-horizontal"></i></span>
         <span class="panel-header-title">Parámetros de Entrada</span>
-        <span class="panel-header-badge">9 variables · red neuronal</span>
+        <span class="schedule-pill off" id="schedule-pill" style="margin-left:auto;">
+          <span class="schedule-dot"></span>
+          <span id="schedule-text">Fuera de horario</span>
+        </span>
       </div>
       <div class="panel-body">
+
+        <!-- Fecha: día de la semana + mes -->
+        <div class="fecha-row">
+          <div class="fecha-block" style="flex:2;">
+            <div class="fecha-block-label">Día de la semana</div>
+            <div class="day-btns">
+              <button class="day-btn" data-dia="0">Lun</button>
+              <button class="day-btn" data-dia="1">Mar</button>
+              <button class="day-btn" data-dia="2">Mié</button>
+              <button class="day-btn" data-dia="3">Jue</button>
+              <button class="day-btn" data-dia="4">Vie</button>
+              <button class="day-btn weekend" data-dia="5">Sáb</button>
+              <button class="day-btn weekend" data-dia="6">Dom</button>
+            </div>
+          </div>
+          <div class="fecha-block">
+            <div class="fecha-block-label">Mes</div>
+            <select class="mes-select" id="mes-select">
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </div>
+        </div>
 
         <!-- Hora -->
         <div class="hora-row">
@@ -670,9 +762,110 @@
     <span id="last-pred">Último análisis: —</span>
   </footer>
 
+  <!-- Modal: fuera de horario escolar -->
+  <div class="modal-overlay" id="modal-schedule">
+    <div class="modal-box">
+      <div class="modal-icon ic ic-xl"><i data-lucide="calendar-x-2"></i></div>
+      <div class="modal-title">Predicción no disponible</div>
+      <div class="modal-body">La calefacción no está activa fuera del horario escolar. El modelo predice derroche solo cuando hay calefacción encendida.</div>
+      <div class="modal-schedule">
+        <strong>Horario con calefacción activa (Lun – Vie)</strong><br>
+        07:06 – 11:00<br>
+        11:01 – 16:00<br>
+        16:01 – 18:00<br>
+        18:01 – 20:40
+      </div>
+      <div class="modal-body" id="modal-detail" style="font-size:10px; color:#f59e0b;"></div>
+      <button class="modal-close" onclick="closeModal()">Entendido</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
+  // ── Día de la semana ─────────────────────────────────────────────
+  let selectedDia = new Date().getDay(); // 0=Dom JS → convertir a 0=Lun Python
+  // JS: 0=Dom,1=Lun,...,6=Sáb → Python weekday: 0=Lun,...,6=Dom
+  const jsToPy = d => (d === 0 ? 6 : d - 1);
+  selectedDia = new Date().getDay(); // guardamos el JS day para la UI
+
+  function getDiaPython() { return jsToPy(selectedDia); }
+
+  const dayBtns = document.querySelectorAll('.day-btn');
+  function setDia(jsDay) {
+    selectedDia = jsDay;
+    dayBtns.forEach(b => {
+      const d = parseInt(b.dataset.dia); // 0=Lun..6=Dom (UI order)
+      b.classList.toggle('active', d === jsToPy(jsDay));
+    });
+    updateSchedulePill();
+  }
+  dayBtns.forEach(b => {
+    b.addEventListener('click', () => {
+      const pyDay = parseInt(b.dataset.dia);
+      // b.dataset.dia ya está en orden Lun=0..Dom=6
+      // selectedDia guardamos el valor JS del día, pero para simplificar usamos pyDay directamente
+      selectedDia = pyDay === 6 ? 0 : pyDay + 1; // revertir a JS day para compatibilidad
+      // más simple: guardar pyDay y usarlo directamente
+      selectedDia = pyDay; // sobreescribir: selectedDia = pyDay (0=Lun UI)
+      dayBtns.forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      updateSchedulePill();
+    });
+  });
+  // init: marcar día actual
+  {
+    const todayPy = jsToPy(new Date().getDay());
+    dayBtns.forEach(b => { if (parseInt(b.dataset.dia) === todayPy) b.classList.add('active'); });
+    selectedDia = todayPy; // ahora selectedDia = pyDay (0=Lun..6=Dom)
+  }
+
+  // Mes
+  const mesSelect = document.getElementById('mes-select');
+  mesSelect.value = new Date().getMonth() + 1;
+  mesSelect.addEventListener('change', updateSchedulePill);
+
+  // ── Horario escolar ───────────────────────────────────────────────
+  // Slots: [horaInicio, minInicio, horaFin, minFin]
+  const SCHEDULE_SLOTS = [
+    [7, 6,  11, 0],
+    [11, 1, 16, 0],
+    [16, 1, 18, 0],
+    [18, 1, 20, 40],
+  ];
+
+  function isInSchedule(hora, diaPy) {
+    if (diaPy >= 5) return false; // Sáb=5, Dom=6
+    return SCHEDULE_SLOTS.some(([hS, mS, hE, mE]) => {
+      const t = hora * 60, s = hS * 60 + mS, e = hE * 60 + mE;
+      return t >= s && t <= e;
+    });
+  }
+
+  function scheduleReason(hora, diaPy) {
+    const dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    if (diaPy >= 5) return `${dias[diaPy]}: fuera de días lectivos (Lun–Vie).`;
+    return `Hora ${String(hora).padStart(2,'0')}:00 fuera de las franjas con calefacción activa.`;
+  }
+
+  function updateSchedulePill() {
+    const hora  = parseInt(document.getElementById('hora-slider').value);
+    const pill  = document.getElementById('schedule-pill');
+    const txt   = document.getElementById('schedule-text');
+    const active = isInSchedule(hora, selectedDia);
+    pill.className = 'schedule-pill ' + (active ? 'on' : 'off');
+    txt.textContent = active ? 'Calefacción activa' : 'Fuera de horario';
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────
+  function closeModal() {
+    document.getElementById('modal-schedule').classList.remove('visible');
+    lucide.createIcons();
+  }
+  document.getElementById('modal-schedule').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
   function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent =
@@ -795,8 +988,19 @@
     const btn=document.getElementById('btn-predict'), errorBox=document.getElementById('error-box');
     const idle=document.getElementById('result-idle'), content=document.getElementById('result-content');
     btn.classList.add('loading'); btn.disabled=true; errorBox.classList.remove('visible');
+    const horaActual = parseInt(horaSlider.value);
+    if (!isInSchedule(horaActual, selectedDia)) {
+      document.getElementById('modal-detail').textContent = scheduleReason(horaActual, selectedDia);
+      document.getElementById('modal-schedule').classList.add('visible');
+      lucide.createIcons();
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      return;
+    }
     const payload = {
-      hora: parseInt(horaSlider.value),
+      hora: horaActual,
+      dia_semana: selectedDia,
+      mes: parseInt(mesSelect.value),
       temp_aula: parseFloat(document.getElementById('temp_aula').value),
       temp_ext: parseFloat(document.getElementById('temp_ext').value),
       humedad_aula: parseFloat(document.getElementById('humedad_aula').value),
