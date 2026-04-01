@@ -30,11 +30,12 @@ Ademas, se archivan (no forman parte del flujo principal):
 
 Flujo activo actual:
 
-1. `scripts/build_gold_dataset.py`
+1. `scripts/build_silver_dataset.py`
 2. `scripts/train_linear_heating_model.py`
-3. `scripts/export_final_ia_dataset.py`
-4. `scripts/train_nn_derroche_model_keras.py`
-5. `scripts/app_predict_derroche.py`
+3. `scripts/build_silver_dataset.py` (segunda pasada tras columna lineal)
+4. `scripts/export_final_ia_dataset.py`
+5. `scripts/train_nn_derroche_model_keras.py`
+6. `scripts/app_predict_derroche.py`
 
 Archivos legacy adicionales (sustituidos por la versión Keras):
 

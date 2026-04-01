@@ -18,16 +18,17 @@
   - Sensores externos meteo.
   - Variables solares y forecast.
 
-### 2.2 Capa gold por hora (implementada)
+### 2.2 Capa Silver (tabla maestra horaria) y Gold (consumo ML)
 - **Fuente única SQL:** `queries/master_query.sql`.
-- **Salida única de capa Gold:** `data/gold/master_dataset.csv`.
-- **Columnas clave:** `datetime`, `dia_semana`, `mes`, `hora`, meteo exterior, solares, `temperatura_aula`, `humedad_aula`, `forecast`, `porcentaje_ventilacion_aula`.
+- **Salida capa Silver:** `data/silver/master_dataset.csv` (tabla consolidada + reglas de negocio).
+- **Salida capa Gold:** `data/gold/dataset_final_ia.csv`, `data/gold/nn_derroche_predictions_keras.csv`.
+- **Columnas clave (master):** `datetime`, `dia_semana`, `mes`, `hora`, meteo exterior, solares, `temperatura_aula`, `humedad_aula`, `forecast`, `porcentaje_ventilacion_aula`.
 
 ### 2.3 Arquitectura actual (refactor Medallion)
-- **`utils/config.py`**: constantes de infraestructura y negocio (pesos/divisor).
+- **`utils/config.py`**: constantes de infraestructura, negocio (pesos/divisor) y rutas Silver/Gold.
 - **`utils/db_manager.py`**: conexión y ejecución de queries PostgreSQL.
 - **`utils/preprocessing.py`**: ventilación, escalado IA, derroche y target siguiente hora.
-- **`scripts/build_gold_dataset.py`**: constructor Gold unificado.
+- **`scripts/build_silver_dataset.py`**: constructor Silver (master horario).
 - **`scripts/run_pipeline.py`**: orquestación end-to-end.
 - **`archive/scripts/`**: scripts legacy/duplicados retirados del flujo principal.
 
@@ -61,13 +62,13 @@
 - **T3 Correlaciones humedad:** **HECHO**
   - Evidencia: `archive/scripts/analyze_humidity_sensors.py` + artefactos en `reports/humidity_analysis/`.
 - **T4 Recopilar datos por hora:** **HECHO**
-  - Evidencia: `queries/master_query.sql` + `scripts/build_gold_dataset.py`.
+  - Evidencia: `queries/master_query.sql` + `scripts/build_silver_dataset.py`.
 - **T5 Calculo temperatura calefaccion + modelo ML lineal:** **HECHO**
   - Evidencia: `scripts/train_linear_heating_model.py` (LinearRegression) + `models/heating_linear_model.joblib`.
 - **T6 Nueva columna temperatura calefaccion inferida:** **HECHO**
-  - Evidencia: columna `temp_calefaccion_lineal` en `data/gold/master_dataset.csv`.
+  - Evidencia: columna `temp_calefaccion_lineal` en `data/silver/master_dataset.csv`.
 - **T7 Nueva columna calefaccion encendida:** **HECHO**
-  - Evidencia: `calefaccion_on_pred` generada por `scripts/build_gold_dataset.py` (schedule con histéresis).
+  - Evidencia: `calefaccion_on_pred` generada por `scripts/build_silver_dataset.py` (schedule con histéresis).
 - **T8 Derroche (minutos abiertos + flag derroche):** **HECHO**
   - Regla aplicada: `derroche = (calefaccion_on_pred == 1) AND (porcentaje_ventilacion_aula > 15)`.
 - **T9 Derroche en hora siguiente:** **HECHO**
@@ -79,8 +80,8 @@
 
 - **T10 (PDF) Red neuronal binaria derroche si/no:** **HECHO**
   - Evidencia: `scripts/train_nn_derroche_model_keras.py`, `models/nn_derroche_model_keras.keras`, `reports/nn_derroche_metrics_keras.txt`.
-- **T11 App de prediccion de derroche:** **HECHO (version CLI minima)**
-  - Evidencia: `scripts/app_predict_derroche.py` (inferencia con Keras: probabilidad + umbral; entrada legible con `--hora 0-23` o sin/cos como en el dataset).
+- **T11 App de prediccion de derroche:** **HECHO (CLI + app web)**
+  - Evidencia: `scripts/app_predict_derroche.py` (CLI); `web_app/app.py` + plantillas (Flask, predicción vía API / interfaz).
 
 - **Dataset final IA + predicciones (pipeline cerrado para entrega):** **CERRADO**
   - `data/gold/dataset_final_ia.csv`, export con filtro calefaccion on + huecos imputados en entrenamiento; `scripts/generate_data_report.py` para informe HTML legible.
@@ -99,8 +100,8 @@
   - `models/heating_linear_model.joblib`
   - `models/nn_derroche_model_keras.keras`
   - `models/nn_derroche_preprocess_keras.joblib` (incluye umbral)
-  - `data/gold/heating_linear_predictions.csv`
-  - `data/gold/master_dataset.csv`
+  - `data/silver/heating_linear_predictions.csv`
+  - `data/silver/master_dataset.csv`
   - `data/gold/dataset_final_ia.csv`
   - `data/gold/nn_derroche_predictions_keras.csv`
   - `reports/heating_linear_model_metrics.txt`
@@ -119,8 +120,8 @@
 
 ## 7) Proximos pasos (orden recomendado para cumplir PDF)
 
-1. Mejorar T11 de app CLI a app web (opcional pero recomendable para defensa).
-3. Presentacion 5-8 diapositivas con evidencia (metricas, consultas, graficas); memoria tecnica en `docs/entrega/MEMORIA_TECNICA.md`.
+1. Presentacion 5-8 diapositivas con evidencia (metricas, consultas, graficas, Grafana, app web); memoria tecnica en `docs/entrega/MEMORIA_TECNICA.md`.
+2. Exportar memoria a **PDF** si el centro lo exige.
 
 ## 8) Flujo operativo actual (comando único)
 
@@ -129,9 +130,9 @@ python scripts/run_pipeline.py
 ```
 
 Ejecuta secuencialmente:
-1. `build_gold_dataset.py`
+1. `build_silver_dataset.py`
 2. `train_linear_heating_model.py`
-3. `build_gold_dataset.py` (reconstruye target con temperatura lineal)
+3. `build_silver_dataset.py` (reconstruye target con temperatura lineal)
 4. `export_final_ia_dataset.py`
 5. `train_nn_derroche_model_keras.py`
 

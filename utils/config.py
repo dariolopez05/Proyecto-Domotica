@@ -33,3 +33,12 @@ DERROCHE_VENTILATION_THRESHOLD_PCT = 15.0
 
 # CSV bronze (temperatura para normas de calefaccion / modelo lineal)
 BRONZE_HISTORY_CSV = BASE_DIR / "data" / "bronze" / "History_2025-09-01_100-2026-03-02_1400.csv"
+
+# Medallion: silver = tabla horaria consolidada; gold = consumo ML y scoring
+# Ver docs/ARQUITECTURA_MEDALLION.md
+DATA_SILVER_DIR = BASE_DIR / "data" / "silver"
+MASTER_DATASET_CSV = DATA_SILVER_DIR / "master_dataset.csv"
+HEATING_LINEAR_PREDICTIONS_CSV = DATA_SILVER_DIR / "heating_linear_predictions.csv"
+DATA_GOLD_DIR = BASE_DIR / "data" / "gold"
+DATASET_FINAL_IA_CSV = DATA_GOLD_DIR / "dataset_final_ia.csv"
+NN_DERROCHE_PREDICTIONS_KERAS_CSV = DATA_GOLD_DIR / "nn_derroche_predictions_keras.csv"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Entrena un modelo lineal para inferir temperatura de calefaccion y
-anade la columna `temp_calefaccion_lineal` al gold principal.
+anade la columna `temp_calefaccion_lineal` al master en capa Silver.
 """
 
 from __future__ import annotations
@@ -24,12 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from utils.config import BRONZE_HISTORY_CSV
+from utils.config import (
+    BRONZE_HISTORY_CSV,
+    HEATING_LINEAR_PREDICTIONS_CSV,
+    MASTER_DATASET_CSV,
+)
 
-MASTER_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+MASTER_FILE = MASTER_DATASET_CSV
 HISTORY_FILE = BRONZE_HISTORY_CSV
-GOLD_ENRICHED_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
-PREDICTIONS_FILE = BASE_DIR / "data" / "gold" / "heating_linear_predictions.csv"
+SILVER_ENRICHED_FILE = MASTER_DATASET_CSV
+PREDICTIONS_FILE = HEATING_LINEAR_PREDICTIONS_CSV
 MODEL_FILE = BASE_DIR / "models" / "heating_linear_model.joblib"
 METRICS_FILE = BASE_DIR / "reports" / "heating_linear_model_metrics.txt"
 
@@ -57,15 +61,15 @@ def main() -> None:
         raise FileNotFoundError(f"No existe {MASTER_FILE}")
     if not HISTORY_FILE.exists():
         raise FileNotFoundError(f"No existe {HISTORY_FILE}")
-    if not GOLD_ENRICHED_FILE.exists():
-        raise FileNotFoundError(f"No existe {GOLD_ENRICHED_FILE}")
+    if not SILVER_ENRICHED_FILE.exists():
+        raise FileNotFoundError(f"No existe {SILVER_ENRICHED_FILE}")
 
     MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
     METRICS_FILE.parent.mkdir(parents=True, exist_ok=True)
     PREDICTIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     master = pd.read_csv(MASTER_FILE)
-    gold = pd.read_csv(GOLD_ENRICHED_FILE)
+    gold = pd.read_csv(SILVER_ENRICHED_FILE)
     history = pd.read_csv(HISTORY_FILE)
 
     master["datetime"] = pd.to_datetime(master["datetime"], errors="coerce")
@@ -201,7 +205,7 @@ def main() -> None:
         gold = gold.drop(columns=["temp_calefaccion_lineal"])
     gold = gold.merge(pred_df, on="datetime", how="left")
     gold["temp_calefaccion_lineal"] = pd.to_numeric(gold.get("temp_calefaccion_lineal"), errors="coerce")
-    gold.to_csv(GOLD_ENRICHED_FILE, index=False)
+    gold.to_csv(SILVER_ENRICHED_FILE, index=False)
 
     payload = {"pipeline": pipeline, "feature_cols": feature_cols, "target": "temp_calefaccion_real"}
     joblib.dump(payload, MODEL_FILE)
@@ -220,7 +224,7 @@ def main() -> None:
                 f"- R2: {r2:.4f}",
                 "",
                 f"Predicciones: {PREDICTIONS_FILE}",
-                f"Gold actualizado: {GOLD_ENRICHED_FILE}",
+                f"Silver actualizado: {SILVER_ENRICHED_FILE}",
                 f"Modelo guardado: {MODEL_FILE}",
             ]
         ),

@@ -3,7 +3,7 @@
 Entrena una red neuronal con TensorFlow/Keras para clasificacion binaria de
 derroche en la siguiente hora.
 
-Entrada:  data/gold/dataset_final_ia.csv
+Entrada:  data/gold/dataset_final_ia.csv (capa Gold)
 Salida:
   - models/nn_derroche_model_keras.keras
   - models/nn_derroche_preprocess_keras.joblib (imputer+scaler+features)
@@ -37,12 +37,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-DATA_FILE = BASE_DIR / "data" / "gold" / "dataset_final_ia.csv"
+from utils.config import DATASET_FINAL_IA_CSV, NN_DERROCHE_PREDICTIONS_KERAS_CSV
+
+DATA_FILE = DATASET_FINAL_IA_CSV
 MODEL_FILE = BASE_DIR / "models" / "nn_derroche_model_keras.keras"
 PREPROCESS_FILE = BASE_DIR / "models" / "nn_derroche_preprocess_keras.joblib"
 METRICS_FILE = BASE_DIR / "reports" / "nn_derroche_metrics_keras.txt"
 BACKTEST_FILE = BASE_DIR / "reports" / "nn_derroche_backtest_keras.txt"
-PRED_FILE = BASE_DIR / "data" / "gold" / "nn_derroche_predictions_keras.csv"
+PRED_FILE = NN_DERROCHE_PREDICTIONS_KERAS_CSV
 
 
 def set_seeds(seed: int = 42) -> None:

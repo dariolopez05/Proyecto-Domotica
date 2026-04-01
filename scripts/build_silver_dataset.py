@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Construye el Gold unificado (Medallion) desde la unica fuente de verdad SQL.
-Salida unica: data/gold/master_dataset.csv
+Construye la capa Silver (Medallion): tabla maestra horaria desde SQL + reglas.
+Salida: data/silver/master_dataset.csv
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from utils.db_manager import query_to_dataframe
 from utils.config import (
     BRONZE_HISTORY_CSV,
     DOOR_WEIGHT,
+    MASTER_DATASET_CSV,
     TOTAL_WEIGHT_DIVISOR,
     WINDOW_WEIGHT_LARGE,
     WINDOW_WEIGHT_SMALL,
@@ -27,8 +28,10 @@ from utils.heating_normas import calefaccion_on_state_machine, merge_bronze_hist
 from utils.preprocessing import add_derroche_targets, add_temporal_cyclical_features, add_weighted_ventilation_pct
 
 QUERY_FILE = BASE_DIR / "queries" / "master_query.sql"
-OUT_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+OUT_FILE = MASTER_DATASET_CSV
+# Fallback si no hay DB: silver previo, layout antiguo en gold, o CSV legacy
 FALLBACK_FILES = [
+    MASTER_DATASET_CSV,
     BASE_DIR / "data" / "gold" / "master_dataset.csv",
     BASE_DIR / "data" / "gold" / "master_query_result_with_temperature_history_pred.csv",
     BASE_DIR / "data" / "gold" / "master_query_result.csv",
@@ -126,7 +129,7 @@ def main() -> None:
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT_FILE, index=False)
-    print(f"OK gold unificado: {OUT_FILE} filas={len(df)} columnas={len(df.columns)}")
+    print(f"OK silver (master): {OUT_FILE} filas={len(df)} columnas={len(df.columns)}")
 
 
 if __name__ == "__main__":

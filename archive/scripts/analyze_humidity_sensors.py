@@ -14,7 +14,7 @@ import seaborn as sns
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MASTER_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+MASTER_FILE = BASE_DIR / "data" / "silver" / "master_dataset.csv"
 OUT_DIR = BASE_DIR / "reports" / "humidity_analysis"
 
 

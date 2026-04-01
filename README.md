@@ -21,10 +21,10 @@ La ventilación se calcula en SQL con **pesos** (ventana pequeña 1, grande 2, p
 
 ## Estado del desarrollo
 
-- **Gold** unificado: `data/gold/master_dataset.csv`.
-- **Dataset IA** (filas con calefacción on según normas; features con posibles NaN, imputación en el entrenamiento): `data/gold/dataset_final_ia.csv`.
+- **Silver** (tabla maestra horaria): `data/silver/master_dataset.csv`; predicciones lineales auxiliares: `data/silver/heating_linear_predictions.csv`.
+- **Gold** (consumo ML): `data/gold/dataset_final_ia.csv` y `data/gold/nn_derroche_predictions_keras.csv` (filas IA con calefacción on; features con posibles NaN, imputación en entrenamiento).
 - **Modelos:** regresión lineal (temperatura calefacción) + red neuronal **Keras** (derroche).
-- **CLI de predicción:** `scripts/app_predict_derroche.py` (recomendado `--hora 0-23`).
+- **Predicción:** `scripts/app_predict_derroche.py` (CLI) y **`web_app/app.py`** (interfaz web, `python web_app/app.py` → http://localhost:5000).
 - **Informe HTML** de datos: `python scripts/generate_data_report.py` → `reports/informe_datos_gold.html`.
 - **Memoria técnica** y **manual 1 página**: carpeta `docs/entrega/` (`MEMORIA_TECNICA.md`, `MANUAL_1_PAGINA_PROFESOR.md`).
 - Detalle de tareas y trazabilidad: `docs/PROYECTO_ESTADO.md`. Arquitectura: `docs/ARQUITECTURA_MEDALLION.md`. Auditoría de reproducibilidad: `reports/AUDITORIA_REPRODUCIBILIDAD.md`.
@@ -46,13 +46,13 @@ python scripts/run_pipeline.py
 
 Orden interno:
 
-1. `build_gold_dataset.py` — SQL → Gold + normas History + derroche + target.
+1. `build_silver_dataset.py` — SQL → Silver (`master_dataset`) + normas History + derroche + target.
 2. `train_linear_heating_model.py` — modelo lineal y columna `temp_calefaccion_lineal` en el master.
-3. `build_gold_dataset.py` — reconstruye Gold con esa columna.
-4. `export_final_ia_dataset.py` — `dataset_final_ia.csv` (solo calefacción on).
+3. `build_silver_dataset.py` — reconstruye Silver con esa columna.
+4. `export_final_ia_dataset.py` — Gold `dataset_final_ia.csv` (solo calefacción on).
 5. `train_nn_derroche_model_keras.py` — entrena y guarda modelo + preprocesado.
 
-Si PostgreSQL no está disponible, `build_gold_dataset` puede usar un CSV Gold previo como respaldo (ver script).
+Si PostgreSQL no está disponible, `build_silver_dataset` puede usar un CSV previo como respaldo (ver script y `docs/ARQUITECTURA_MEDALLION.md`).
 
 ## Conexión a base de datos
 
@@ -87,9 +87,11 @@ Proyecto-Domotica/
 ├── utils/                # config, db, preprocessing, normas calefacción
 ├── data/
 │   ├── bronze/           # History CSV (temperatura normas / lineal)
-│   └── gold/             # master_dataset, dataset_final_ia, predicciones
+│   ├── silver/           # master_dataset, heating_linear_predictions
+│   └── gold/             # dataset_final_ia, nn_derroche_predictions (consumo ML)
 ├── models/               # joblib + .keras
 ├── reports/              # métricas, informe HTML, auditoría reproducibilidad
+├── web_app/              # app Flask (predicción derroche)
 ├── docs/
 │   ├── entrega/          # memoria técnica + manual 1 página (profesor)
 │   ├── ARQUITECTURA_MEDALLION.md

@@ -2,7 +2,7 @@
 
 Cumple el mínimo del PDF: **dos visualizaciones** (serie temporal + gauge de media) y **variable** para elegir el sensor de temperatura. Los paneles leen la tabla **`ltss`** del mismo PostgreSQL que usa `queries/master_query.sql`.
 
-La capa Gold (`data/gold/master_dataset.csv`) se genera con el pipeline Python; **no hace falta ninguna tabla extra en PostgreSQL** para este dashboard.
+El pipeline Python genera la tabla **`master`** en Silver (`data/silver/master_dataset.csv`, vía `build_silver_dataset.py`). Este dashboard **no** usa ese CSV: lee directamente **`ltss`** en PostgreSQL. **No hace falta ninguna tabla extra** en la base para Grafana.
 
 ## Requisitos
 

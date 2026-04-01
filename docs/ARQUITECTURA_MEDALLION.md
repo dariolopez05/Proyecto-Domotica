@@ -17,21 +17,30 @@ Después se crea el target futuro:
 
 ## 2. Capas de datos
 
-## Bronze
+### Bronze
 
 - Datos de origen y exportaciones históricas.
-- Ruta típica: `data/bronze/`.
+- Ruta típica: `data/bronze/` (p. ej. CSV History para normas de calefacción).
 
-## Gold (fuente operativa principal)
+### Silver
 
-- Archivo maestro: `data/gold/master_dataset.csv`.
-- Es la tabla consolidada por hora para análisis y modelado.
+- Tabla horaria **consolidada y enriquecida**: SQL maestro + merge History + calendario + reglas de calefacción (`calefaccion_on_pred`).
+- Archivo principal: `data/silver/master_dataset.csv`.
+- Artefacto del modelo lineal de temperatura (predicciones antes del merge en el master): `data/silver/heating_linear_predictions.csv`.
+- Constructor: `scripts/build_silver_dataset.py`.
 
-## Dataset final IA
+### Gold
 
-- Archivo para entrenar la red neuronal:
-  - `data/gold/dataset_final_ia.csv`
-- Contiene solo features finales + target.
+- **Consumo** para ML y scoring: solo lo que alimenta modelos o análisis de producto.
+- `data/gold/dataset_final_ia.csv` — features + target para la red neuronal.
+- `data/gold/nn_derroche_predictions_keras.csv` — salida del modelo (probabilidades / clase).
+- Generación: `export_final_ia_dataset.py` (desde Silver) y `train_nn_derroche_model_keras.py`.
+
+Las rutas canónicas están centralizadas en `utils/config.py` (`MASTER_DATASET_CSV`, `DATASET_FINAL_IA_CSV`, etc.).
+
+### Migración desde layout anterior
+
+Si aún tienes `data/gold/master_dataset.csv` o `heating_linear_predictions.csv`, muévelos a `data/silver/`. El script `build_silver_dataset.py` también acepta como fallback temporal un `master_dataset.csv` antiguo en `data/gold/` si no hay base de datos.
 
 ---
 
@@ -48,21 +57,21 @@ Después se crea el target futuro:
 
 ## 4. Utilidades centralizadas (`utils/`)
 
-## `utils/config.py`
+### `utils/config.py`
 
-- Constantes de conexión DB.
+- Constantes de conexión DB y **rutas Medallion** (Silver/Gold).
 - Pesos de ventilación:
   - ventana pequeña: `1`
   - ventana grande: `2`
   - puerta: `4`
 - Divisor total: `20`.
 
-## `utils/db_manager.py` / `utils/config.py`
+### `utils/db_manager.py` / `utils/config.py`
 
 - `config.py` carga `.env` al importarse (si existe) y define `DB_HOST`, `DB_PORT`, `DB_NAME`, etc.
 - `db_manager.py` abre conexión PostgreSQL y devuelve DataFrame desde SQL.
 
-## `utils/preprocessing.py`
+### `utils/preprocessing.py`
 
 - Normaliza `% ventilación`.
 - Añade `derroche` y `target_derroche_next_hour`.
@@ -73,29 +82,29 @@ Después se crea el target futuro:
 
 ## 5. Scripts activos (responsabilidad única)
 
-## `scripts/build_gold_dataset.py`
+### `scripts/build_silver_dataset.py`
 
-- Construye `master_dataset.csv`.
+- Construye `data/silver/master_dataset.csv`.
 - Añade calendario (`dia_semana`, `mes`, `hora`).
 - Añade lógica de calefacción (`calefaccion_on_pred`).
 - Añade target de derroche.
 - Si PostgreSQL no está disponible, usa fallback local.
 
-## `scripts/train_linear_heating_model.py`
+### `scripts/train_linear_heating_model.py`
 
 - Entrena modelo lineal de temperatura de calefacción.
 - Guarda:
   - `models/heating_linear_model.joblib`
   - `reports/heating_linear_model_metrics.txt`
-  - `data/gold/heating_linear_predictions.csv`
-- Inyecta `temp_calefaccion_lineal` en `master_dataset.csv`.
+  - `data/silver/heating_linear_predictions.csv`
+- Inyecta `temp_calefaccion_lineal` en `master_dataset.csv` (Silver).
 
-## `scripts/export_final_ia_dataset.py`
+### `scripts/export_final_ia_dataset.py`
 
-- Extrae desde `master_dataset.csv` las columnas finales de IA.
+- Extrae desde el master (Silver) las columnas finales de IA.
 - Genera `data/gold/dataset_final_ia.csv`.
 
-## `scripts/train_nn_derroche_model_keras.py`
+### `scripts/train_nn_derroche_model_keras.py`
 
 - Entrena red neuronal (TensorFlow/Keras, MLP tabular) binaria para `target_derroche_next_hour`.
 - Guarda:
@@ -104,12 +113,12 @@ Después se crea el target futuro:
   - `reports/nn_derroche_metrics_keras.txt`
   - `data/gold/nn_derroche_predictions_keras.csv`
 
-## `scripts/app_predict_derroche.py`
+### `scripts/app_predict_derroche.py`
 
 - App CLI para inferencia manual.
 - Devuelve predicción y probabilidad de derroche de la siguiente hora.
 
-## `scripts/run_pipeline.py`
+### `scripts/run_pipeline.py`
 
 - Orquestador end-to-end del flujo completo.
 
@@ -123,9 +132,9 @@ python scripts/run_pipeline.py
 
 Internamente ejecuta:
 
-1. `build_gold_dataset.py`
+1. `build_silver_dataset.py`
 2. `train_linear_heating_model.py`
-3. `build_gold_dataset.py` (reconstrucción con columna lineal)
+3. `build_silver_dataset.py` (reconstrucción con columna lineal)
 4. `export_final_ia_dataset.py`
 5. `train_nn_derroche_model_keras.py`
 
@@ -140,12 +149,12 @@ Internamente ejecuta:
 
 ## 8. Troubleshooting rápido
 
-## Error DB
+### Error DB
 
 - Revisa `.env` (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`).
-- Si la DB local está caída, `build_gold_dataset.py` usa fallback CSV.
+- Si la DB local está caída, `build_silver_dataset.py` usa fallback CSV.
 
-## Dependencias
+### Dependencias
 
 ```bash
 pip install -r requirements.txt

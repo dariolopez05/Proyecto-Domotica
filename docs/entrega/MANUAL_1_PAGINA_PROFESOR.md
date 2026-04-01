@@ -23,8 +23,8 @@ Objetivo de IA:
 
 - Fuente histórica en PostgreSQL/Timescale (`ltss`) + exportaciones locales.
 - Arquitectura Medallion simplificada:
-  - **Gold unificado:** `data/gold/master_dataset.csv`
-  - **Dataset IA final:** `data/gold/dataset_final_ia.csv`
+  - **Silver (master):** `data/silver/master_dataset.csv`
+  - **Gold (dataset IA):** `data/gold/dataset_final_ia.csv`
 - Fuente única de negocio SQL:
   - `queries/master_query.sql`
 

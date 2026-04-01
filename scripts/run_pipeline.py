@@ -24,9 +24,9 @@ def run_step(script_name: str) -> None:
 
 def main() -> None:
     steps = [
-        "build_gold_dataset.py",
+        "build_silver_dataset.py",
         "train_linear_heating_model.py",
-        "build_gold_dataset.py",  # recalcula calefaccion_on_pred/target tras columna lineal
+        "build_silver_dataset.py",  # recalcula calefaccion_on_pred/target tras columna lineal
         "export_final_ia_dataset.py",
         "train_nn_derroche_model_keras.py",
     ]

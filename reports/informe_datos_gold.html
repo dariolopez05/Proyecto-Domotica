@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Informe datos Gold — Domótica</title>
+  <title>Informe datos Silver/Gold — Domótica</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -63,15 +63,15 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Informe de datos (capa Gold)</h1>
-    <p class="sub">Generado: 2026-04-01 11:01 UTC · Proyecto Domótica</p>
+    <h1>Informe de datos (Silver + Gold)</h1>
+    <p class="sub">Generado: 2026-04-01 14:38 UTC · Proyecto Domótica</p>
 
     <div class="card">
       <h2>Dataset final IA</h2>
       <p class="meta">Archivo: <code>data/gold/dataset_final_ia.csv</code></p>
       <ul class="kpis">
         <li><strong>429</strong><span>filas</span></li>
-        <li><strong>10</strong><span>columnas</span></li>
+        <li><strong>14</strong><span>columnas</span></li>
         <li><strong>167</strong><span>positivos (derroche=1)</span></li>
         <li><strong>169</strong><span>filas con algún valor faltante</span></li>
       </ul>
@@ -113,6 +113,50 @@
       <td>-0.7071</td>
       <td>-0.5000</td>
       <td>0.5000</td>
+    </tr>
+    <tr>
+      <th>dia_semana_sin</th>
+      <td>429.0000</td>
+      <td>0.3640</td>
+      <td>0.4884</td>
+      <td>-0.4339</td>
+      <td>0.0000</td>
+      <td>0.4339</td>
+      <td>0.7818</td>
+      <td>0.9749</td>
+    </tr>
+    <tr>
+      <th>dia_semana_cos</th>
+      <td>429.0000</td>
+      <td>0.0904</td>
+      <td>0.7892</td>
+      <td>-0.9010</td>
+      <td>-0.9010</td>
+      <td>-0.2225</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>mes_sin</th>
+      <td>429.0000</td>
+      <td>-0.3216</td>
+      <td>0.3701</td>
+      <td>-0.8660</td>
+      <td>-0.5000</td>
+      <td>-0.5000</td>
+      <td>0.0000</td>
+      <td>0.5000</td>
+    </tr>
+    <tr>
+      <th>mes_cos</th>
+      <td>429.0000</td>
+      <td>0.8551</td>
+      <td>0.1696</td>
+      <td>0.5000</td>
+      <td>0.8660</td>
+      <td>0.8660</td>
+      <td>1.0000</td>
+      <td>1.0000</td>
     </tr>
     <tr>
       <th>temp_aula</th>
@@ -246,21 +290,41 @@
     </tr>
     <tr>
       <th>6</th>
-      <td>hora_cos</td>
+      <td>mes_cos</td>
       <td>0</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>sol_elevacion</td>
+      <td>mes_sin</td>
       <td>0</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>porcentaje_ventilacion_aula</td>
+      <td>dia_semana_cos</td>
       <td>0</td>
     </tr>
     <tr>
       <th>9</th>
+      <td>dia_semana_sin</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>hora_cos</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>sol_elevacion</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>porcentaje_ventilacion_aula</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>13</th>
       <td>target_derroche_next_hour</td>
       <td>0</td>
     </tr>
@@ -271,8 +335,9 @@
 
     <div class="card">
       
-        <h2>Master dataset (referencia)</h2>
-        <p class="meta">Filas: <strong>9,261</strong>
+        <h2>Master dataset (Silver)</h2>
+        <p class="meta">Archivo: <code>data/silver/master_dataset.csv</code>
+        &nbsp;· Filas: <strong>9,261</strong>
         &nbsp;· Rango temporal: <strong>2024-12-18 16:00:00</strong> → <strong>2026-03-02 08:00:00</strong></p>
         <h3>Calefacción (normas History)</h3><table class="dataframe dataframe">
   <thead>

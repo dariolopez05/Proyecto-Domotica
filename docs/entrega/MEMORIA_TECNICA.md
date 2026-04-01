@@ -16,7 +16,7 @@ El problema es el **derroche de calefacción** en un aula del centro: ventanas o
 
 Tras iterar el criterio con datos reales y normas de temperatura, el derroche en una hora `t` se define como:
 
-1. **Calefacción considerada encendida** según las **normas de temperatura** aplicadas a la temperatura del **export History** (bronze), con tramos horarios laborables y histéresis (apagar/encender por umbrales). Esto se materializa en `calefaccion_on_normas_history` (`utils/heating_normas.py` + merge del CSV en `build_gold_dataset.py`).  
+1. **Calefacción considerada encendida** según las **normas de temperatura** aplicadas a la temperatura del **export History** (bronze), con tramos horarios laborables y histéresis (apagar/encender por umbrales). Esto se materializa en `calefaccion_on_normas_history` (`utils/heating_normas.py` + merge del CSV en `build_silver_dataset.py`).  
    Si no hubiera columna de normas History, el código puede usar `calefaccion_on_pred` (temperatura lineal / aula) como respaldo.
 
 2. **Ventilación ponderada alta:** `porcentaje_ventilacion_aula` **estrictamente mayor que 15 %**.  
@@ -47,15 +47,15 @@ Tras iterar el criterio con datos reales y normas de temperatura, el derroche en
 - **Puerta:** peso **4** (equivalente a dos ventanas grandes en términos de peso).  
 - **Divisor:** 20 — convierte el cómputo en un **porcentaje** comparable entre horas.
 
-Implementación activa: `queries/master_query.sql` con constantes inyectadas desde `utils/config.py` en `build_gold_dataset.py`.
+Implementación activa: `queries/master_query.sql` con constantes inyectadas desde `utils/config.py` en `build_silver_dataset.py`.
 
 ---
 
 ## 5. Arquitectura de datos (Medallion simplificada)
 
 - **Bronze:** datos crudos o exportaciones (History).  
-- **Gold:** `data/gold/master_dataset.csv` — tabla horaria única para análisis y features.  
-- **Dataset IA:** `data/gold/dataset_final_ia.csv` — solo columnas de entrada + target para la red.
+- **Silver:** `data/silver/master_dataset.csv` — tabla horaria única para análisis y features.  
+- **Gold (IA):** `data/gold/dataset_final_ia.csv` — solo columnas de entrada + target para la red.
 
 **Decisión:** Un solo archivo Gold evita bifurcaciones difíciles de reproducir; el export aplica el filtro de negocio (solo horas con calefacción encendida según normas History para entrenar el caso de uso “calefacción on”) y deja **NaN** en features donde falte meteo/aula para que el **imputer del entrenamiento** (fit solo en train) no duplique lógica con el CSV.
 
@@ -89,7 +89,7 @@ Se puede pasar **`--hora 0-23`** para no calcular a mano seno/coseno; el modelo 
 ## 8. Informes y trazabilidad
 
 - Métricas de modelos en `reports/`.  
-- Informe HTML legible sobre Gold / dataset IA: `python scripts/generate_data_report.py` → `reports/informe_datos_gold.html`.  
+- Informe HTML legible sobre Silver (master) y Gold (dataset IA): `python scripts/generate_data_report.py` → `reports/informe_datos_gold.html`.  
 - Auditoría de reproducibilidad: [`../../reports/AUDITORIA_REPRODUCIBILIDAD.md`](../../reports/AUDITORIA_REPRODUCIBILIDAD.md).
 
 ---

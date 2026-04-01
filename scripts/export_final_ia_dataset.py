@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exporta el dataset final de IA desde master_dataset.csv.
+Exporta el dataset Gold de IA desde data/silver/master_dataset.csv.
 
 Solo filas con calefaccion encendida (1): si esta apagada (0), no sirve para
 entrenar/inferir el modelo de derroche. Usa `calefaccion_on_normas_history`
@@ -13,13 +13,19 @@ las rellena; no se hace dropna global aqui para no descartar filas imputables.
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 import pandas as pd
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MASTER_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
-OUT_FILE = BASE_DIR / "data" / "gold" / "dataset_final_ia.csv"
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from utils.config import DATASET_FINAL_IA_CSV, MASTER_DATASET_CSV
+
+MASTER_FILE = MASTER_DATASET_CSV
+OUT_FILE = DATASET_FINAL_IA_CSV
 
 
 def main() -> None:

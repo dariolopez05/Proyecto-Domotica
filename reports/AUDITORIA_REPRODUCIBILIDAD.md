@@ -7,7 +7,7 @@ Fecha: 2026-03-26
 Se auditó la reproducibilidad técnica del flujo activo:
 
 - `scripts/run_pipeline.py`
-- `scripts/build_gold_dataset.py`
+- `scripts/build_silver_dataset.py`
 - `scripts/train_linear_heating_model.py`
 - `scripts/export_final_ia_dataset.py`
 - `scripts/train_nn_derroche_model_keras.py`
@@ -46,7 +46,7 @@ Observación principal:
 
 ## 3) Integridad de datasets
 
-- `data/gold/master_dataset.csv`: **9261 filas**
+- `data/silver/master_dataset.csv`: **9261 filas**
 - `data/gold/dataset_final_ia.csv`: **5169 filas**
 - `target_derroche_next_hour` nulos en dataset final IA: **0**
 - Columnas finales IA: **exactas** (10 columnas esperadas)
@@ -64,7 +64,7 @@ Observación principal:
 - Validación:
   - Pesos y divisor definidos en `utils/config.py`.
   - `queries/master_query.sql` usa placeholders.
-  - `scripts/build_gold_dataset.py` inyecta constantes en runtime.
+  - `scripts/build_silver_dataset.py` inyecta constantes en runtime.
 
 Nota:
 
@@ -106,7 +106,7 @@ Se considera reproducible en entorno de evaluación cuando:
 2. PostgreSQL está activo con credenciales válidas en `.env`.
 3. `python scripts/run_pipeline.py` termina en éxito.
 4. Se generan/actualizan:
-   - `data/gold/master_dataset.csv`
+   - `data/silver/master_dataset.csv`
    - `data/gold/dataset_final_ia.csv`
    - `models/heating_linear_model.joblib`
    - `models/nn_derroche_model_keras.keras`

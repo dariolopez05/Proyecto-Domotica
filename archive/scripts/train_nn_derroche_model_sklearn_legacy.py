@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-DATA_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+DATA_FILE = BASE_DIR / "data" / "silver" / "master_dataset.csv"
 MODEL_FILE = BASE_DIR / "models" / "nn_derroche_model.joblib"
 METRICS_FILE = BASE_DIR / "reports" / "nn_derroche_metrics.txt"
 PRED_FILE = BASE_DIR / "data" / "gold" / "nn_derroche_predictions.csv"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Genera un informe HTML legible sobre los datasets de gold (IA + master).
+Genera un informe HTML legible sobre Silver (master) y Gold (dataset IA).
 
 Salida por defecto: reports/informe_datos_gold.html
 """
@@ -19,8 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-DATASET_IA = BASE_DIR / "data" / "gold" / "dataset_final_ia.csv"
-MASTER_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
+from utils.config import DATASET_FINAL_IA_CSV, MASTER_DATASET_CSV
+
+DATASET_IA = DATASET_FINAL_IA_CSV
+MASTER_FILE = MASTER_DATASET_CSV
 OUT_HTML = BASE_DIR / "reports" / "informe_datos_gold.html"
 
 
@@ -88,12 +90,13 @@ def build_html(
         if "datetime" in df_master.columns:
             dt = pd.to_datetime(df_master["datetime"], errors="coerce")
             master_block = f"""
-        <h2>Master dataset (referencia)</h2>
-        <p class="meta">Filas: <strong>{len(df_master):,}</strong>
+        <h2>Master dataset (Silver)</h2>
+        <p class="meta">Archivo: <code>data/silver/master_dataset.csv</code>
+        &nbsp;· Filas: <strong>{len(df_master):,}</strong>
         &nbsp;· Rango temporal: <strong>{dt.min()}</strong> → <strong>{dt.max()}</strong></p>
         """
         else:
-            master_block = f"<h2>Master dataset</h2><p class=\"meta\">Filas: <strong>{len(df_master):,}</strong></p>"
+            master_block = f"<h2>Master dataset (Silver)</h2><p class=\"meta\">Archivo: <code>data/silver/master_dataset.csv</code> · Filas: <strong>{len(df_master):,}</strong></p>"
         if "calefaccion_on_normas_history" in df_master.columns:
             c = df_master["calefaccion_on_normas_history"].value_counts(dropna=False)
             master_block += "<h3>Calefacción (normas History)</h3>" + df_to_html_table(
@@ -105,7 +108,7 @@ def build_html(
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Informe datos Gold — Domótica</title>
+  <title>Informe datos Silver/Gold — Domótica</title>
   <style>
     :root {{
       --bg: #f6f7f9;
@@ -165,7 +168,7 @@ def build_html(
 </head>
 <body>
   <div class="wrap">
-    <h1>Informe de datos (capa Gold)</h1>
+    <h1>Informe de datos (Silver + Gold)</h1>
     <p class="sub">Generado: {generated_at} · Proyecto Domótica</p>
 
     <div class="card">
@@ -186,7 +189,7 @@ def build_html(
     </div>
 
     <div class="card">
-      {master_block if master_block.strip() else '<p class="meta">No se encontró master_dataset.csv o está vacío.</p>'}
+      {master_block if master_block.strip() else '<p class="meta">No se encontró data/silver/master_dataset.csv o está vacío.</p>'}
     </div>
 
     <p class="meta">Para regenerar: <code>python scripts/generate_data_report.py</code></p>

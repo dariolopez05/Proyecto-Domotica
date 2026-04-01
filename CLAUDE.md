@@ -22,7 +22,7 @@ Database connection is optional — scripts fall back to local CSV files if Post
 python scripts/run_pipeline.py
 
 # Individual steps
-python scripts/build_gold_dataset.py
+python scripts/build_silver_dataset.py
 python scripts/train_linear_heating_model.py
 python scripts/export_final_ia_dataset.py
 python scripts/train_nn_derroche_model_keras.py
@@ -45,18 +45,18 @@ PostgreSQL (ltss) or local CSV
          │
     master_query.sql  ← single source of truth for all sensor data
          │
-    build_gold_dataset.py
+    build_silver_dataset.py
          ├─ adds heating schedule state (schedule + hysteresis)
          ├─ adds derroche target (heat_on AND vent>15%)
          ├─ adds hour_sin/hour_cos cyclical features
          │
-    data/gold/master_dataset.csv  (9,262 rows)
+    data/silver/master_dataset.csv  (≈9,262 rows)
          │
     ┌────┴──────────────────────┐
     │                           │
 train_linear_heating_model.py   export_final_ia_dataset.py
     │ (uses History_*.csv)           │
-    ▼                           data/gold/dataset_final_ia.csv (5,170 rows)
+    ▼                           data/gold/dataset_final_ia.csv (≈5,170 rows)
 heating_linear_model.joblib          │
     │ (inject temp predictions)       │
     └──────────────────────────►train_nn_derroche_model_keras.py
@@ -94,7 +94,8 @@ heating_linear_model.joblib          │
 | `utils/preprocessing.py` | Ventilation normalization, target creation, cyclical encoding |
 | `queries/master_query.sql` | Hourly aggregation SQL (135 lines, 2+ CTEs) |
 | `scripts/run_pipeline.py` | Orchestrator — runs all steps in order |
-| `data/gold/` | Final processed datasets (source for models) |
+| `data/silver/` | Master hourly table + linear model sidecar CSVs |
+| `data/gold/` | ML-ready dataset + NN predictions |
 | `models/` | Persisted model files (joblib + .keras) |
 | `reports/` | Evaluation metrics and confusion matrices |
 | `archive/` | Superseded scripts and queries — do not use |
