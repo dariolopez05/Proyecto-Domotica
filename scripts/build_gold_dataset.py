@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 
-import numpy as np
 import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,7 +16,14 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from utils.db_manager import query_to_dataframe
-from utils.config import DOOR_WEIGHT, TOTAL_WEIGHT_DIVISOR, WINDOW_WEIGHT_LARGE, WINDOW_WEIGHT_SMALL
+from utils.config import (
+    BRONZE_HISTORY_CSV,
+    DOOR_WEIGHT,
+    TOTAL_WEIGHT_DIVISOR,
+    WINDOW_WEIGHT_LARGE,
+    WINDOW_WEIGHT_SMALL,
+)
+from utils.heating_normas import calefaccion_on_state_machine, merge_bronze_history_temperature
 from utils.preprocessing import add_derroche_targets, add_hour_cyclical_features, add_weighted_ventilation_pct
 
 QUERY_FILE = BASE_DIR / "queries" / "master_query.sql"
@@ -63,59 +69,12 @@ def add_calendar_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_heating_state_schedule(df: pd.DataFrame) -> pd.DataFrame:
+    """Misma regla horaria que normas History; temperatura = lineal si existe, si no aula."""
     out = df.sort_values("datetime").copy()
     temp_pred_col = "temp_calefaccion_lineal"
     if temp_pred_col not in out.columns:
-        # fallback: aproximacion lineal simple basada en temperatura de aula
         out[temp_pred_col] = pd.to_numeric(out.get("temperatura_aula"), errors="coerce")
-
-    dt = pd.to_datetime(out["datetime"], errors="coerce")
-    dow = dt.dt.weekday
-    minutes = dt.dt.hour * 60 + dt.dt.minute
-
-    def in_range(start_hm: tuple[int, int], end_hm: tuple[int, int]) -> pd.Series:
-        start = start_hm[0] * 60 + start_hm[1]
-        end = end_hm[0] * 60 + end_hm[1]
-        return minutes.ge(start) & minutes.le(end)
-
-    slot1 = (dow.le(4)) & in_range((6, 59), (11, 0))
-    slot2 = (dow.le(4)) & in_range((11, 2), (16, 0))
-    slot3 = (dow.le(4)) & in_range((16, 2), (18, 0))
-    slot4 = (dow.le(4)) & in_range((18, 2), (20, 40))
-    in_schedule = slot1 | slot2 | slot3 | slot4
-
-    t_off = pd.Series(np.nan, index=out.index, dtype="float64")
-    t_on = pd.Series(np.nan, index=out.index, dtype="float64")
-    t_off.loc[slot1 | slot2 | slot4] = 22.0
-    t_on.loc[slot1 | slot2 | slot4] = 21.9
-    t_off.loc[slot3] = 21.6
-    t_on.loc[slot3] = 21.5
-
-    temp = pd.to_numeric(out[temp_pred_col], errors="coerce")
-    state = 0
-    values: list[int] = []
-    prev_date = None
-    for idx in out.index:
-        cur_dt = dt.loc[idx]
-        cur_date = None if pd.isna(cur_dt) else cur_dt.date()
-        if prev_date is not None and cur_date is not None and cur_date != prev_date:
-            state = 0
-        prev_date = cur_date
-        if not bool(in_schedule.loc[idx]):
-            state = 0
-            values.append(state)
-            continue
-        cur_temp = temp.loc[idx]
-        if pd.isna(cur_temp):
-            values.append(state)
-            continue
-        if cur_temp > float(t_off.loc[idx]):
-            state = 0
-        elif cur_temp < float(t_on.loc[idx]):
-            state = 1
-        values.append(state)
-
-    out["calefaccion_on_pred"] = pd.Series(values, index=out.index, dtype="int8")
+    out["calefaccion_on_pred"] = calefaccion_on_state_machine(out["datetime"], out[temp_pred_col])
     return out
 
 
@@ -142,6 +101,10 @@ def main() -> None:
         df = pd.read_csv(fallback_found)
     df = add_calendar_columns(df)
     df = add_weighted_ventilation_pct(df)
+    df = merge_bronze_history_temperature(df, BRONZE_HISTORY_CSV)
+    df["calefaccion_on_normas_history"] = calefaccion_on_state_machine(
+        df["datetime"], df["temperatura_history_calef"]
+    )
     df = add_heating_state_schedule(df)
     df = add_derroche_targets(df)
     df["derroche"] = df["derroche"].astype("boolean")

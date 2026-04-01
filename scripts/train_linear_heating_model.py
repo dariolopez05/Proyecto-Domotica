@@ -6,6 +6,7 @@ anade la columna `temp_calefaccion_lineal` al gold principal.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import joblib
@@ -20,8 +21,13 @@ from sklearn.preprocessing import OneHotEncoder
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from utils.config import BRONZE_HISTORY_CSV
+
 MASTER_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
-HISTORY_FILE = BASE_DIR / "data" / "History_2025-09-01_100-2026-03-02_1400.csv"
+HISTORY_FILE = BRONZE_HISTORY_CSV
 GOLD_ENRICHED_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
 PREDICTIONS_FILE = BASE_DIR / "data" / "gold" / "heating_linear_predictions.csv"
 MODEL_FILE = BASE_DIR / "models" / "heating_linear_model.joblib"

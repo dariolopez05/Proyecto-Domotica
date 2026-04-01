@@ -28,7 +28,12 @@ def scale_features(df: pd.DataFrame, feature_cols: list[str]) -> tuple[pd.DataFr
 
 def add_derroche_targets(df: pd.DataFrame, threshold_pct: float = DERROCHE_VENTILATION_THRESHOLD_PCT) -> pd.DataFrame:
     out = df.copy()
-    heat_on = pd.to_numeric(out.get("calefaccion_on_pred"), errors="coerce").fillna(0).astype(int).eq(1)
+    heat_col = (
+        "calefaccion_on_normas_history"
+        if "calefaccion_on_normas_history" in out.columns
+        else "calefaccion_on_pred"
+    )
+    heat_on = pd.to_numeric(out.get(heat_col), errors="coerce").fillna(0).astype(int).eq(1)
     vent_high = pd.to_numeric(out.get("porcentaje_ventilacion_aula"), errors="coerce").fillna(0.0).gt(
         float(threshold_pct)
     )

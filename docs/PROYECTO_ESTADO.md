@@ -3,7 +3,7 @@
 ## 1) Infraestructura (segun PDF vs estado real)
 
 - **PDF indica:** TimescaleDB/PostgreSQL en `172.16.204.240:5432`, BD `postgres`.
-- **Estado actual del proyecto:** PostgreSQL local en `localhost:5433`, BD `domotica`, usuario `postgres`.
+- **Estado actual del proyecto:** PostgreSQL local (p. ej. `localhost:5432`), BD `postgres`, usuario `postgres` (credenciales en `.env`).
 - **Decision actual:** trabajar en local para desarrollo/ejecucion de scripts.
 - **Impacto:** las queries y scripts son validos, pero para entrega hay que documentar claramente esta diferencia respecto al entorno del PDF.
 

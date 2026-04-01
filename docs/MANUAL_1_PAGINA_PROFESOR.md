@@ -62,12 +62,13 @@ Objetivo de IA:
 
 ## 2) Modelo IA (red neuronal) (Fase C)
 
-- Script: `scripts/train_nn_derroche_model.py`
-- Modelo: `MLPClassifier` (clasificación binaria)
+- Script: `scripts/train_nn_derroche_model_keras.py`
+- Modelo: TensorFlow/Keras (MLP tabular Dense → Dense → sigmoid)
 - Target: `target_derroche_next_hour`
 - Artefactos:
-  - `models/nn_derroche_model.joblib`
-  - `reports/nn_derroche_metrics.txt`
+  - `models/nn_derroche_model_keras.keras`
+  - `models/nn_derroche_preprocess_keras.joblib` (imputer, scaler, umbral)
+  - `reports/nn_derroche_metrics_keras.txt`
 
 ---
 
@@ -84,7 +85,7 @@ Incluye:
 2. Entrenamiento lineal
 3. Rebuild Gold con columna lineal
 4. Export dataset IA
-5. Entrenamiento red neuronal
+5. Entrenamiento red neuronal (Keras)
 
 Predicción manual por CLI:
 
@@ -102,4 +103,4 @@ python scripts/app_predict_derroche.py --hora-sin ... --hora-cos ... --temp-aula
 
 Referencia de estado detallado:
 
-- `PROYECTO_ESTADO.md`
+- `docs/PROYECTO_ESTADO.md`

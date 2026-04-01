@@ -57,11 +57,10 @@ Después se crea el target futuro:
   - puerta: `4`
 - Divisor total: `20`.
 
-## `utils/db_manager.py`
+## `utils/db_manager.py` / `utils/config.py`
 
-- Carga `.env`.
-- Abre conexión PostgreSQL.
-- Ejecuta query y devuelve DataFrame.
+- `config.py` carga `.env` al importarse (si existe) y define `DB_HOST`, `DB_PORT`, `DB_NAME`, etc.
+- `db_manager.py` abre conexión PostgreSQL y devuelve DataFrame desde SQL.
 
 ## `utils/preprocessing.py`
 
@@ -96,13 +95,14 @@ Después se crea el target futuro:
 - Extrae desde `master_dataset.csv` las columnas finales de IA.
 - Genera `data/gold/dataset_final_ia.csv`.
 
-## `scripts/train_nn_derroche_model.py`
+## `scripts/train_nn_derroche_model_keras.py`
 
-- Entrena red neuronal (MLP) binaria para `target_derroche_next_hour`.
+- Entrena red neuronal (TensorFlow/Keras, MLP tabular) binaria para `target_derroche_next_hour`.
 - Guarda:
-  - `models/nn_derroche_model.joblib`
-  - `reports/nn_derroche_metrics.txt`
-  - `data/gold/nn_derroche_predictions.csv`
+  - `models/nn_derroche_model_keras.keras`
+  - `models/nn_derroche_preprocess_keras.joblib`
+  - `reports/nn_derroche_metrics_keras.txt`
+  - `data/gold/nn_derroche_predictions_keras.csv`
 
 ## `scripts/app_predict_derroche.py`
 
@@ -127,7 +127,7 @@ Internamente ejecuta:
 2. `train_linear_heating_model.py`
 3. `build_gold_dataset.py` (reconstrucción con columna lineal)
 4. `export_final_ia_dataset.py`
-5. `train_nn_derroche_model.py`
+5. `train_nn_derroche_model_keras.py`
 
 ---
 

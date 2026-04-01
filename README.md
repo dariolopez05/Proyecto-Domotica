@@ -8,7 +8,7 @@ Proyecto de eficiencia energética orientado a detectar derroche en la siguiente
 - Dataset final IA en `data/gold/dataset_final_ia.csv`.
 - Modelo lineal para temperatura de calefacción y red neuronal para derroche entrenados.
 - Scripts legacy movidos a `archive/scripts/`.
-- Estado detallado y trazabilidad: `PROYECTO_ESTADO.md`.
+- Estado detallado y trazabilidad: `docs/PROYECTO_ESTADO.md`.
 - Guía de arquitectura y flujo: `docs/ARQUITECTURA_MEDALLION.md`.
 - Manual breve para presentación: `docs/MANUAL_1_PAGINA_PROFESOR.md`.
 - Auditoría técnica final: `docs/AUDITORIA_REPRODUCIBILIDAD.md`.
@@ -27,6 +27,10 @@ Pasos internos:
 3. Rebuild Gold con columna lineal
 4. Export dataset final IA (`export_final_ia_dataset.py`)
 5. Entrenamiento red neuronal (Keras) (`train_nn_derroche_model_keras.py`)
+
+## Conexión a PostgreSQL
+
+Copia `.env.example` a `.env` y configura host, puerto, base de datos (p. ej. `postgres`), usuario y contraseña. La consulta Gold usa la tabla `ltss`. Más detalle en `scripts/README_MASTER_QUERY.md`.
 
 ## Objetivos
 

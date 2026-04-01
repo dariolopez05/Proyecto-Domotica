@@ -30,21 +30,19 @@ pip install pandas psycopg2-binary python-dotenv scikit-learn joblib tensorflow-
 
 Las credenciales se configuran en el archivo `.env` en la raíz del proyecto.
 
-**Ya está configurado con tus credenciales:**
-- Host: `localhost`
-- Puerto: `5433`
-- Base de datos: `domotica`
-- Usuario: `postgres`
-- Contraseña: `admin`
+**Variables típicas** (copia `.env.example` a `.env` y rellena):
 
-**Si necesitas cambiar las credenciales**, edita el archivo `.env`:
+- Host: `localhost`
+- Puerto: `5432` (o el que uses)
+- Base de datos: `postgres` (o la que contenga `ltss`)
+- Usuario / contraseña: según tu instalación
 
 ```
 DB_HOST=localhost
-DB_PORT=5433
-DB_NAME=domotica
+DB_PORT=5432
+DB_NAME=postgres
 DB_USER=postgres
-DB_PASSWORD=admin
+DB_PASSWORD=tu_contraseña
 ```
 
 > ⚠️ **IMPORTANTE**: El archivo `.env` contiene credenciales y NO debe ser commiteado a git. Está en `.gitignore`.
@@ -99,7 +97,7 @@ Asegúrate de que existe `queries/master_query.sql`.
 
 1. Verifica que PostgreSQL esté corriendo
 2. Comprueba `.env`
-3. Verifica host/puerto (`localhost:5433` en el entorno actual)
+3. Verifica host/puerto en `.env` (p. ej. `localhost` y `5432`)
 4. `build_gold_dataset.py` usa fallback a CSV local si DB no está disponible
 
 ### Error: "Módulo no encontrado"

@@ -26,6 +26,7 @@ Ademas, se archivan (no forman parte del flujo principal):
   - `archive/scripts/analyze_sensors.py`
   - `archive/scripts/analyze_humidity_sensors.py`
   - `archive/scripts/analysis_master_query.py` / `.ps1`
+- `docs_legacy/`: texto histórico; puede citar puertos o nombres de BD antiguos. Configuración vigente: `docs/` y `.env.example` en la raíz del proyecto.
 
 Flujo activo actual:
 
