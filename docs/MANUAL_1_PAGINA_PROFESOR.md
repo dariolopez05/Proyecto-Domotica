@@ -90,8 +90,10 @@ Incluye:
 Predicción manual por CLI:
 
 ```bash
-python scripts/app_predict_derroche.py --hora-sin ... --hora-cos ... --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
+python scripts/app_predict_derroche.py --hora 14 --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
 ```
+
+(`--hora` es 0-23; calcula internamente `hora_sin`/`hora_cos` como el dataset. Opcional: pasar `--hora-sin` y `--hora-cos` a mano.)
 
 ---
 

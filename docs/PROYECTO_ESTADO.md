@@ -80,7 +80,10 @@
 - **T10 (PDF) Red neuronal binaria derroche si/no:** **HECHO**
   - Evidencia: `scripts/train_nn_derroche_model_keras.py`, `models/nn_derroche_model_keras.keras`, `reports/nn_derroche_metrics_keras.txt`.
 - **T11 App de prediccion de derroche:** **HECHO (version CLI minima)**
-  - Evidencia: `scripts/app_predict_derroche.py` (inferencia con Keras: probabilidad + umbral).
+  - Evidencia: `scripts/app_predict_derroche.py` (inferencia con Keras: probabilidad + umbral; entrada legible con `--hora 0-23` o sin/cos como en el dataset).
+
+- **Dataset final IA + predicciones (pipeline cerrado para entrega):** **CERRADO**
+  - `data/gold/dataset_final_ia.csv`, export con filtro calefaccion on + huecos imputados en entrenamiento; `scripts/generate_data_report.py` para informe HTML legible.
 
 ## Fase D - Dashboard
 

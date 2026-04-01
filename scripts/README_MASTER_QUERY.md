@@ -8,7 +8,7 @@ Este directorio contiene el flujo operativo unificado del proyecto.
 - **`train_linear_heating_model.py`**: entrena regresión lineal e inyecta `temp_calefaccion_lineal` en `master_dataset.csv`.
 - **`export_final_ia_dataset.py`**: genera `data/gold/dataset_final_ia.csv` con las features finales y el target.
 - **`train_nn_derroche_model_keras.py`**: entrena red neuronal binaria (TensorFlow/Keras) para `target_derroche_next_hour`.
-- **`app_predict_derroche.py`**: app CLI para inferencia de derroche.
+- **`app_predict_derroche.py`**: app CLI para inferencia de derroche (`--hora 0-23` o `--hora-sin`/`--hora-cos`).
 - **`run_pipeline.py`**: ejecuta todos los pasos en orden, de extremo a extremo.
 - **`archive/scripts/run_master_query.ps1`**: utilidad legacy (no recomendada en el flujo principal).
 
