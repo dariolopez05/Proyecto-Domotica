@@ -24,7 +24,7 @@ from utils.config import (
     WINDOW_WEIGHT_SMALL,
 )
 from utils.heating_normas import calefaccion_on_state_machine, merge_bronze_history_temperature
-from utils.preprocessing import add_derroche_targets, add_hour_cyclical_features, add_weighted_ventilation_pct
+from utils.preprocessing import add_derroche_targets, add_temporal_cyclical_features, add_weighted_ventilation_pct
 
 QUERY_FILE = BASE_DIR / "queries" / "master_query.sql"
 OUT_FILE = BASE_DIR / "data" / "gold" / "master_dataset.csv"
@@ -111,7 +111,7 @@ def main() -> None:
     df["target_derroche_next_hour"] = (
         df["target_derroche_next_hour"].astype("boolean")
     )
-    df = add_hour_cyclical_features(df)
+    df = add_temporal_cyclical_features(df)
     # Aliases estables para IA (evita ambiguedad de nombres entre scripts).
     if "temperatura_aula" in df.columns:
         df["temp_aula"] = pd.to_numeric(df["temperatura_aula"], errors="coerce")

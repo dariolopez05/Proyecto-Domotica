@@ -150,3 +150,5 @@ Ejecuta secuencialmente:
   - `docs/entrega/MEMORIA_TECNICA.md`
 - Uso operativo de scripts:
   - `scripts/README_MASTER_QUERY.md`
+- Comparativa requisitos PDF vs implementacion:
+  - `docs/COMPARATIVA_REQUISITOS_PDF.md`

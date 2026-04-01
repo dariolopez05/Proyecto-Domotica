@@ -2,11 +2,11 @@ BACKTEST TEMPORAL (walk-forward manual) - Keras derroche
 Dataset (train 80%): 343 filas, pos=139 neg=204
 Val window size: 200 (aprox 58.3% del train)
 
-Fold 1: train_n=143 val_n=200 pos_val=89 thr=0.05 acc=0.4500 f1=0.4811 prec=0.4146 rec=0.5730 roc_auc=0.5178
-Fold 2: train_n=154 val_n=189 pos_val=86 thr=0.05 acc=0.5767 f1=0.4521 prec=0.5500 rec=0.3837 roc_auc=0.5750
-Fold 3: train_n=165 val_n=178 pos_val=86 thr=0.50 acc=0.8034 f1=0.8066 prec=0.7684 rec=0.8488 roc_auc=0.8729
-Fold 4: train_n=176 val_n=167 pos_val=86 thr=0.05 acc=0.4850 f1=0.5865 prec=0.5000 rec=0.7093 roc_auc=0.5040
-Fold 5: train_n=188 val_n=155 pos_val=86 thr=0.15 acc=0.6194 f1=0.7281 prec=0.6031 rec=0.9186 roc_auc=0.6343
+Fold 1: train_n=143 val_n=200 pos_val=89 thr=0.05 acc=0.5900 f1=0.4875 prec=0.5493 rec=0.4382 roc_auc=0.5646
+Fold 2: train_n=154 val_n=189 pos_val=86 thr=0.05 acc=0.4550 f1=0.6255 prec=0.4550 rec=1.0000 roc_auc=0.4364
+Fold 3: train_n=165 val_n=178 pos_val=86 thr=0.05 acc=0.5056 f1=0.6071 prec=0.4928 rec=0.7907 roc_auc=0.5150
+Fold 4: train_n=176 val_n=167 pos_val=86 thr=0.05 acc=0.5449 f1=0.6885 prec=0.5316 rec=0.9767 roc_auc=0.5511
+Fold 5: train_n=188 val_n=155 pos_val=86 thr=0.05 acc=0.5548 f1=0.7137 prec=0.5548 rec=1.0000 roc_auc=0.5396
 
-Media (folds): acc=0.5869 f1=0.6109 precision=0.5672 recall=0.6867 roc_auc=0.6208 thr=0.1600
-Std (folds):  acc=0.1242 f1=0.1376 precision=0.1182 recall=0.1925 roc_auc=0.1342 thr=0.1744
+Media (folds): acc=0.5301 f1=0.6245 precision=0.5167 recall=0.8411 roc_auc=0.5214 thr=0.0500
+Std (folds):  acc=0.0462 f1=0.0789 precision=0.0377 recall=0.2162 roc_auc=0.0455 thr=0.0000

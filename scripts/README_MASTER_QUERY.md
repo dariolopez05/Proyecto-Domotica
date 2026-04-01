@@ -85,7 +85,7 @@ En `master_dataset.csv` quedan también derivadas:
 - `calefaccion_on_pred`
 - `derroche`
 - `target_derroche_next_hour`
-- `hora_sin`, `hora_cos`
+- `hora_sin`, `hora_cos`, `dia_semana_sin`, `dia_semana_cos`, `mes_sin`, `mes_cos`
 
 ## Solución de problemas
 

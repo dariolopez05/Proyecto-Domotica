@@ -30,7 +30,7 @@ Objetivo de IA:
 
 ### Variables clave usadas
 
-- Contexto temporal: `hora_sin`, `hora_cos`
+- Contexto temporal (cíclico): `hora_sin`/`hora_cos`, `dia_semana_sin`/`dia_semana_cos`, `mes_sin`/`mes_cos`
 - Entorno: `temp_ext`, `viento`, `nubosidad`, `sol_elevacion`
 - Aula: `temp_aula`, `humedad_aula`
 - Ventilación: `porcentaje_ventilacion_aula`
@@ -90,10 +90,10 @@ Incluye:
 Predicción manual por CLI:
 
 ```bash
-python scripts/app_predict_derroche.py --hora 14 --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
+python scripts/app_predict_derroche.py --fecha "2025-12-18 14:00:00" --temp-aula ... --temp-ext ... --humedad-aula ... --viento ... --nubosidad ... --sol-elevacion ... --porcentaje-ventilacion-aula ...
 ```
 
-(`--hora` es 0-23; calcula internamente `hora_sin`/`hora_cos` como el dataset. Opcional: pasar `--hora-sin` y `--hora-cos` a mano.)
+O con hora suelta: `--hora 14 --dia-semana 3 --mes 12` (día 0=Lunes…6=Domingo). El script calcula los seis senos/cosenos como en el CSV.
 
 ---
 

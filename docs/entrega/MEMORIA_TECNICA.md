@@ -73,7 +73,7 @@ Implementación activa: `queries/master_query.sql` con constantes inyectadas des
 ### 6.2 Red neuronal — derroche siguiente hora (Keras)
 
 **Script:** `scripts/train_nn_derroche_model_keras.py`.  
-**Entrada:** features numéricas (incl. `hora_sin`, `hora_cos` por ciclicidad de la hora), imputación mediana y escalado **ajustados solo en train**, validación temporal interna, umbral de decisión elegido en validación y guardado en el joblib.
+**Entrada:** features numéricas con **codificación cíclica** de calendario: `hora_sin`/`hora_cos`, `dia_semana_sin`/`dia_semana_cos`, `mes_sin`/`mes_cos` (alineado con hora / día de la semana / mes del PDF), más sensores; imputación mediana y escalado **ajustados solo en train**, validación temporal interna, umbral en el joblib.
 
 **Justificación:** Uso de **TensorFlow/Keras** alineado con la formación (MLP tabular), frente a un `MLPClassifier` previo archivado; separación clara entre preprocesado persistido y modelo para inferencia reproducible.
 

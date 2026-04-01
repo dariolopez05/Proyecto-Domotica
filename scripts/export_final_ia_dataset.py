@@ -30,6 +30,10 @@ def main() -> None:
     required_cols = [
         "hora_sin",
         "hora_cos",
+        "dia_semana_sin",
+        "dia_semana_cos",
+        "mes_sin",
+        "mes_cos",
         "temp_aula",
         "temp_ext",
         "humedad_aula",

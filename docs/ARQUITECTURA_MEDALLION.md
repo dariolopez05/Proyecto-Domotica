@@ -66,7 +66,7 @@ Después se crea el target futuro:
 
 - Normaliza `% ventilación`.
 - Añade `derroche` y `target_derroche_next_hour`.
-- Genera `hora_sin`, `hora_cos`.
+- Genera codificación cíclica: `hora_sin`/`hora_cos`, `dia_semana_sin`/`dia_semana_cos`, `mes_sin`/`mes_cos`.
 - Escalado de features para IA (`StandardScaler`).
 
 ---

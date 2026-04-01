@@ -28,6 +28,7 @@ La ventilación se calcula en SQL con **pesos** (ventana pequeña 1, grande 2, p
 - **Informe HTML** de datos: `python scripts/generate_data_report.py` → `reports/informe_datos_gold.html`.
 - **Memoria técnica** y **manual 1 página**: carpeta `docs/entrega/` (`MEMORIA_TECNICA.md`, `MANUAL_1_PAGINA_PROFESOR.md`).
 - Detalle de tareas y trazabilidad: `docs/PROYECTO_ESTADO.md`. Arquitectura: `docs/ARQUITECTURA_MEDALLION.md`. Auditoría de reproducibilidad: `reports/AUDITORIA_REPRODUCIBILIDAD.md`.
+- **Cumplimiento vs PDF de asignatura:** `docs/COMPARATIVA_REQUISITOS_PDF.md`.
 
 **Pendiente de la especificación de asignatura:** dashboard **Grafana** (mínimo dos visualizaciones + selector) y **presentación** de cierre; ver `docs/PROYECTO_ESTADO.md`.
 
@@ -60,10 +61,10 @@ El entorno de la memoria PDF de asignatura puede describir otro host; el desarro
 
 ## Predicción manual (CLI)
 
-Ejemplo con hora legible:
+Ejemplo con fecha completa (recomendado; deriva hora, día de semana y mes como en el entrenamiento):
 
 ```bash
-python scripts/app_predict_derroche.py --hora 14 --temp-aula 22 --temp-ext 15 --humedad-aula 50 --viento 10 --nubosidad 40 --sol-elevacion 20 --porcentaje-ventilacion-aula 10
+python scripts/app_predict_derroche.py --fecha "2025-12-18 14:00:00" --temp-aula 22 --temp-ext 15 --humedad-aula 50 --viento 10 --nubosidad 40 --sol-elevacion 20 --porcentaje-ventilacion-aula 10
 ```
 
 Hace falta tener entrenados `models/nn_derroche_model_keras.keras` y `models/nn_derroche_preprocess_keras.joblib`.

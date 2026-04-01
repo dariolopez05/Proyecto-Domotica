@@ -1,28 +1,28 @@
 RED NEURONAL (Keras) - DERROCHE SIGUIENTE HORA
 Filas train: 343 (train interno: 275 val: 68)
 Filas test: 86
-Features: hora_sin, hora_cos, temp_aula, temp_ext, humedad_aula, viento, nubosidad, sol_elevacion, porcentaje_ventilacion_aula
+Features: hora_sin, hora_cos, dia_semana_sin, dia_semana_cos, mes_sin, mes_cos, temp_aula, temp_ext, humedad_aula, viento, nubosidad, sol_elevacion, porcentaje_ventilacion_aula
 
-Umbral seleccionado (val): 0.30 (mejor F1 val=0.9286)
+Umbral seleccionado (val): 0.40 (mejor F1 val=0.9091)
 
-Accuracy: 0.5581
-F1-score: 0.5476
-Precision: 0.4107
+Accuracy: 0.5116
+F1-score: 0.5227
+Precision: 0.3833
 Recall: 0.8214
-ROC-AUC: 0.6866
+ROC-AUC: 0.6675
 
 Matriz de confusion [ [TN, FP], [FN, TP] ]:
-[[25, 33], [5, 23]]
+[[21, 37], [5, 23]]
 
 Classification report:
               precision    recall  f1-score   support
 
-           0     0.8333    0.4310    0.5682        58
-           1     0.4107    0.8214    0.5476        28
+           0     0.8077    0.3621    0.5000        58
+           1     0.3833    0.8214    0.5227        28
 
-    accuracy                         0.5581        86
-   macro avg     0.6220    0.6262    0.5579        86
-weighted avg     0.6957    0.5581    0.5615        86
+    accuracy                         0.5116        86
+   macro avg     0.5955    0.5917    0.5114        86
+weighted avg     0.6695    0.5116    0.5074        86
 
 
 Modelo guardado: C:\IABD\Poryectos Finales\Proyecto-Domotica\models\nn_derroche_model_keras.keras
