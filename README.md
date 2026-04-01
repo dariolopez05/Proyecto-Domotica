@@ -13,6 +13,43 @@ Proyecto de eficiencia energética orientado a detectar derroche en la siguiente
 - Manual breve para presentación: `docs/MANUAL_1_PAGINA_PROFESOR.md`.
 - Auditoría técnica final: `docs/AUDITORIA_REPRODUCIBILIDAD.md`.
 
+## App web — Predicción interactiva
+
+Interfaz visual para introducir los parámetros manualmente y obtener la predicción del modelo.
+
+### Requisitos previos
+
+Necesitas **Python 3.12** (TensorFlow no soporta Python 3.14+). Instálalo desde la Microsoft Store buscando "Python 3.12" o con:
+
+```bash
+winget install Python.Python.3.12
+```
+
+### Instalación de dependencias (solo la primera vez)
+
+```bash
+py -3.12 -m pip install tensorflow-cpu flask joblib pandas numpy scikit-learn==1.7.2
+```
+
+> La versión exacta `scikit-learn==1.7.2` es necesaria para cargar el preprocesador guardado con el modelo.
+
+### Arrancar el servidor
+
+```bash
+py -3.12 web_app/app.py
+```
+
+Abre el navegador en **http://localhost:5000**
+
+### Uso
+
+1. Ajusta la **hora** (0–23) con el slider — se convierte automáticamente a sin/cos
+2. Rellena el resto de parámetros con los sliders o escribiendo el valor directamente
+3. Pulsa **Ejecutar análisis predictivo**
+4. El panel derecho muestra la probabilidad de derroche en la siguiente hora y el veredicto
+
+---
+
 ## Pipeline operativo
 
 Ejecutar extremo a extremo:

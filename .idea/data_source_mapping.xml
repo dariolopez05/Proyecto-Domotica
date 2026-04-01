@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/queries/master_query.sql" value="4989b561-48db-4326-85e4-025386fbd5c5" />
-    <file url="file://$PROJECT_DIR$/queries/window-door_total.sql" value="4989b561-48db-4326-85e4-025386fbd5c5" />
-  </component>
-</project>
