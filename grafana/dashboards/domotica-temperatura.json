@@ -12,7 +12,7 @@
       }
     ]
   },
-  "description": "Sensores acotados a la lista de `queries/entity_ids_listed.sql` (ver `queries/grafana_entity_ids.sql`). **Vista:** *Un sensor* = una serie + KPIs; *Todos numéricos* = varias series (mismos sensores numéricos que el master), sin KPIs. Rango de fechas arriba a la derecha.",
+  "description": "Monitorización de sensores de temperatura desde la tabla **ltss** (Home Assistant / PostgreSQL). Elija el sensor arriba y el **rango de fechas** (arriba a la derecha). Si no ves líneas, amplía el rango: los volcados de prueba suelen ser **históricos** (p. ej. 2024), no los últimos días.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -30,25 +30,27 @@
     },
     {
       "datasource": {"type": "postgres", "uid": "postgres-ltss"},
-      "description": "**Un sensor:** contactos 0/1, numéricos como en ltss. **Todos numéricos:** superposición de las magnitudes numéricas del proyecto (sin binarios ni forecast texto).",
+      "description": "Lecturas del sensor seleccionado. El eje Y se ajusta de forma suave al rango típico de interiores.",
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"fixedColor": "#E85D04", "mode": "fixed"},
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisGridShow": true,
-            "axisLabel": "",
+            "axisLabel": "Temperatura (°C)",
             "axisPlacement": "auto",
+            "axisSoftMax": 32,
+            "axisSoftMin": 12,
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 15,
+            "fillOpacity": 28,
             "gradientMode": "opacity",
             "hideFrom": {"legend": false, "tooltip": false, "viz": false},
             "insertNulls": false,
             "lineInterpolation": "smooth",
-            "lineWidth": 2,
+            "lineWidth": 2.5,
             "pointSize": 4,
             "scaleDistribution": {"type": "linear"},
             "showPoints": "never",
@@ -56,22 +58,22 @@
             "stacking": {"group": "A", "mode": "none"},
             "thresholdsStyle": {"mode": "off"}
           },
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 80}]},
-          "unit": "none"
+          "unit": "celsius"
         },
         "overrides": []
       },
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 1},
+      "gridPos": {"h": 11, "w": 24, "x": 0, "y": 1},
       "id": 1,
       "options": {
         "legend": {
-          "calcs": ["mean", "min", "max", "lastNotNull"],
+          "calcs": ["min", "mean", "max", "lastNotNull"],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true,
-          "width": 280
+          "showLegend": false,
+          "width": 220
         },
         "tooltip": {"mode": "multi", "sort": "desc"}
       },
@@ -81,28 +83,28 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  entity_id AS metric,\n  v AS value\nFROM (\n  SELECT\n    \"time\",\n    entity_id,\n    CASE\n      WHEN trim(state) IN ('on', 'off') THEN CASE WHEN trim(state) = 'on' THEN 1::double precision ELSE 0::double precision END\n      WHEN trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$' THEN trim(state)::double precision\n      ELSE NULL\n    END AS v\n  FROM public.ltss\n  WHERE state IS NOT NULL\n    AND state <> 'unavailable'\n    AND $__timeFilter(\"time\")\n) AS sub\nWHERE v IS NOT NULL\n  AND (\n    (\n      '${vista}' = 'numericos'\n      AND entity_id IN (\n        'sensor.mislata_direccion_viento',\n        'sensor.mislata_humedad',\n        'sensor.mislata_nubosidad',\n        'sensor.mislata_presion',\n        'sensor.mislata_temperatura',\n        'sensor.mislata_viento',\n        'sensor.sensor_temperatura_4_humidity',\n        'sensor.sensor_temperatura_4_pressure',\n        'sensor.sensor_temperatura_4_temperature',\n        'sensor.sun_solar_azimuth',\n        'sensor.sun_solar_elevation'\n      )\n    )\n    OR ('${vista}' = 'uno' AND entity_id = '${sensor}')\n  )\nORDER BY \"time\"",
+          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  trim(state)::numeric AS \"Temperatura\"\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")\nORDER BY \"time\"",
           "refId": "A"
         }
       ],
-      "title": "Serie temporal (ltss — lista proyecto)",
+      "title": "Temperatura en el tiempo",
       "type": "timeseries"
     },
     {
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 13},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 12},
       "id": 11,
       "panels": [],
-      "title": "Resumen (solo vista «Un sensor»)",
+      "title": "Resumen del período seleccionado",
       "type": "row"
     },
     {
       "datasource": {"type": "postgres", "uid": "postgres-ltss"},
-      "description": "Solo aplica con Vista = Un sensor.",
+      "description": "Media aritmética de todas las lecturas válidas en el rango de fechas activo.",
       "fieldConfig": {
         "defaults": {
           "color": {"mode": "thresholds"},
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [],
           "max": 40,
           "min": -5,
@@ -116,11 +118,11 @@
               {"color": "#F94144", "value": 30}
             ]
           },
-          "unit": "none"
+          "unit": "celsius"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 9, "x": 0, "y": 14},
+      "gridPos": {"h": 8, "w": 9, "x": 0, "y": 13},
       "id": 2,
       "options": {
         "minVizHeight": 80,
@@ -138,7 +140,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT NOW() AS \"time\", AVG(v) AS value FROM (\n  SELECT CASE\n    WHEN trim(state) IN ('on', 'off') THEN CASE WHEN trim(state) = 'on' THEN 1::double precision ELSE 0::double precision END\n    WHEN trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$' THEN trim(state)::double precision\n    ELSE NULL\n  END AS v\n  FROM public.ltss\n  WHERE entity_id = '${sensor}'\n    AND state IS NOT NULL\n    AND state <> 'unavailable'\n    AND $__timeFilter(\"time\")\n) sub\nWHERE v IS NOT NULL AND '${vista}' = 'uno'",
+          "rawSql": "SELECT\n  NOW() AS \"time\",\n  AVG(trim(state)::numeric) AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")",
           "refId": "A"
         }
       ],
@@ -147,18 +149,18 @@
     },
     {
       "datasource": {"type": "postgres", "uid": "postgres-ltss"},
-      "description": "Solo vista Un sensor.",
+      "description": "Última medición registrada en el intervalo (o la más reciente disponible).",
       "fieldConfig": {
         "defaults": {
           "color": {"fixedColor": "#F4A261", "mode": "fixed"},
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
-          "unit": "none"
+          "unit": "celsius"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 5, "x": 9, "y": 14},
+      "gridPos": {"h": 8, "w": 5, "x": 9, "y": 13},
       "id": 3,
       "options": {
         "colorMode": "value",
@@ -176,7 +178,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \"time\" AS \"time\", v AS value FROM (\n  SELECT \"time\",\n    CASE\n      WHEN trim(state) IN ('on', 'off') THEN CASE WHEN trim(state) = 'on' THEN 1::double precision ELSE 0::double precision END\n      WHEN trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$' THEN trim(state)::double precision\n      ELSE NULL\n    END AS v\n  FROM public.ltss\n  WHERE entity_id = '${sensor}'\n    AND state IS NOT NULL\n    AND state <> 'unavailable'\n    AND $__timeFilter(\"time\")\n    AND '${vista}' = 'uno'\n) x\nWHERE v IS NOT NULL\nORDER BY \"time\" DESC\nLIMIT 1",
+          "rawSql": "SELECT \"time\" AS \"time\", trim(state)::numeric AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")\nORDER BY \"time\" DESC\nLIMIT 1",
           "refId": "A"
         }
       ],
@@ -188,14 +190,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {"fixedColor": "#2A9D8F", "mode": "fixed"},
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
-          "unit": "none"
+          "unit": "celsius"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 5, "x": 14, "y": 14},
+      "gridPos": {"h": 8, "w": 5, "x": 14, "y": 13},
       "id": 4,
       "options": {
         "colorMode": "value",
@@ -213,7 +215,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT NOW() AS \"time\", MIN(v) AS value FROM (\n  SELECT CASE\n    WHEN trim(state) IN ('on', 'off') THEN CASE WHEN trim(state) = 'on' THEN 1::double precision ELSE 0::double precision END\n    WHEN trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$' THEN trim(state)::double precision\n    ELSE NULL\n  END AS v\n  FROM public.ltss\n  WHERE entity_id = '${sensor}'\n    AND state IS NOT NULL\n    AND state <> 'unavailable'\n    AND $__timeFilter(\"time\")\n) sub\nWHERE v IS NOT NULL AND '${vista}' = 'uno'",
+          "rawSql": "SELECT NOW() AS \"time\", MIN(trim(state)::numeric) AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")",
           "refId": "A"
         }
       ],
@@ -225,14 +227,14 @@
       "fieldConfig": {
         "defaults": {
           "color": {"fixedColor": "#E76F51", "mode": "fixed"},
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [],
           "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
-          "unit": "none"
+          "unit": "celsius"
         },
         "overrides": []
       },
-      "gridPos": {"h": 8, "w": 5, "x": 19, "y": 14},
+      "gridPos": {"h": 8, "w": 5, "x": 19, "y": 13},
       "id": 5,
       "options": {
         "colorMode": "value",
@@ -250,7 +252,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT NOW() AS \"time\", MAX(v) AS value FROM (\n  SELECT CASE\n    WHEN trim(state) IN ('on', 'off') THEN CASE WHEN trim(state) = 'on' THEN 1::double precision ELSE 0::double precision END\n    WHEN trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$' THEN trim(state)::double precision\n    ELSE NULL\n  END AS v\n  FROM public.ltss\n  WHERE entity_id = '${sensor}'\n    AND state IS NOT NULL\n    AND state <> 'unavailable'\n    AND $__timeFilter(\"time\")\n) sub\nWHERE v IS NOT NULL AND '${vista}' = 'uno'",
+          "rawSql": "SELECT NOW() AS \"time\", MAX(trim(state)::numeric) AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")",
           "refId": "A"
         }
       ],
@@ -259,7 +261,7 @@
     },
     {
       "datasource": {"type": "postgres", "uid": "postgres-ltss"},
-      "description": "Lecturas con valor numérico o on/off en el rango.",
+      "description": "Número de puntos de medición válidos en el rango (útil para ver densidad de datos).",
       "fieldConfig": {
         "defaults": {
           "color": {"fixedColor": "#6C757D", "mode": "fixed"},
@@ -270,7 +272,7 @@
         },
         "overrides": []
       },
-      "gridPos": {"h": 3, "w": 24, "x": 0, "y": 22},
+      "gridPos": {"h": 3, "w": 24, "x": 0, "y": 21},
       "id": 6,
       "options": {
         "colorMode": "value",
@@ -288,7 +290,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT NOW() AS \"time\", COUNT(*)::double precision AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND $__timeFilter(\"time\")\n  AND '${vista}' = 'uno'\n  AND (\n    trim(state) IN ('on', 'off')\n    OR trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  )",
+          "rawSql": "SELECT NOW() AS \"time\", COUNT(*)::double precision AS value\nFROM public.ltss\nWHERE entity_id = '${sensor}'\n  AND state IS NOT NULL\n  AND state <> 'unavailable'\n  AND trim(state) ~ '^-?[0-9]+(\\.[0-9]+)?$'\n  AND $__timeFilter(\"time\")",
           "refId": "A"
         }
       ],
@@ -302,38 +304,32 @@
   "templating": {
     "list": [
       {
-        "current": {"selected": true, "text": "Un sensor", "value": "uno"},
-        "hide": 0,
-        "label": "Vista",
-        "name": "vista",
-        "query": "uno : Un sensor, numericos : Todos numéricos (superpuestos)",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
         "current": {},
         "datasource": {"type": "postgres", "uid": "postgres-ltss"},
-        "definition": "SELECT entity_id FROM (VALUES ('binary_sensor.sensor_puerta_1_contact'), ('binary_sensor.sensor_ventana_1_contact'), ('binary_sensor.sensor_ventana_2_contact'), ('binary_sensor.sensor_ventana_3_contact'), ('binary_sensor.sensor_ventana_4_contact'), ('binary_sensor.sensor_ventana_5_contact'), ('binary_sensor.sensor_ventana_6_contact'), ('binary_sensor.sensor_ventana_7_contact'), ('binary_sensor.sensor_ventana_8_contact'), ('binary_sensor.sensor_ventana_9_contact'), ('binary_sensor.sensor_ventana_10_contact'), ('binary_sensor.sensor_ventana_12_contact'), ('sensor.mislata_direccion_viento'), ('sensor.mislata_humedad'), ('sensor.mislata_nubosidad'), ('sensor.mislata_presion'), ('sensor.mislata_temperatura'), ('sensor.mislata_viento'), ('sensor.sensor_temperatura_4_humidity'), ('sensor.sensor_temperatura_4_pressure'), ('sensor.sensor_temperatura_4_temperature'), ('sensor.sun_solar_azimuth'), ('sensor.sun_solar_elevation'), ('weather.forecast_mislata')) AS t(entity_id) ORDER BY 1",
+        "definition": "SELECT entity_id FROM (VALUES ('sensor.mislata_temperatura'), ('sensor.sensor_temperatura_4_temperature')) AS t(entity_id) ORDER BY 1",
         "hide": 0,
         "includeAll": false,
-        "label": "Sensor",
+        "label": "Sensor de temperatura",
         "multi": false,
         "name": "sensor",
         "options": [],
-        "query": "SELECT entity_id FROM (VALUES ('binary_sensor.sensor_puerta_1_contact'), ('binary_sensor.sensor_ventana_1_contact'), ('binary_sensor.sensor_ventana_2_contact'), ('binary_sensor.sensor_ventana_3_contact'), ('binary_sensor.sensor_ventana_4_contact'), ('binary_sensor.sensor_ventana_5_contact'), ('binary_sensor.sensor_ventana_6_contact'), ('binary_sensor.sensor_ventana_7_contact'), ('binary_sensor.sensor_ventana_8_contact'), ('binary_sensor.sensor_ventana_9_contact'), ('binary_sensor.sensor_ventana_10_contact'), ('binary_sensor.sensor_ventana_12_contact'), ('sensor.mislata_direccion_viento'), ('sensor.mislata_humedad'), ('sensor.mislata_nubosidad'), ('sensor.mislata_presion'), ('sensor.mislata_temperatura'), ('sensor.mislata_viento'), ('sensor.sensor_temperatura_4_humidity'), ('sensor.sensor_temperatura_4_pressure'), ('sensor.sensor_temperatura_4_temperature'), ('sensor.sun_solar_azimuth'), ('sensor.sun_solar_elevation'), ('weather.forecast_mislata')) AS t(entity_id) ORDER BY 1",
+        "query": "SELECT entity_id FROM (VALUES ('sensor.mislata_temperatura'), ('sensor.sensor_temperatura_4_temperature')) AS t(entity_id) ORDER BY 1",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 0,
+        "sort": 1,
         "type": "query"
       }
     ]
   },
-  "time": {"from": "now-5y", "to": "now"},
+  "time": {
+    "from": "2024-12-18T18:06:21.000Z",
+    "to": "2026-03-02T08:39:21.000Z"
+  },
   "timepicker": {},
   "timezone": "",
   "title": "Domótica — temperatura (LTSS)",
   "uid": "domotica-temp",
-  "version": 4,
+  "version": 9,
   "weekStart": ""
 }

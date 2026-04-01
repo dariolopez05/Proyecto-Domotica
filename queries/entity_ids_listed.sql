@@ -1,4 +1,3 @@
--- Lista de entity_id: mantener alineada con queries/grafana_entity_ids.sql (Grafana).
 select time, entity_id, STATE as valor,
 	attributes->>'friendly_name' as nombre,
 	attributes->>'device_class' as dispositivo,

@@ -34,11 +34,10 @@ Si PostgreSQL y Grafana están en la misma red (p. ej. servidor del centro), usa
 
 | Elemento | Descripción |
 |----------|-------------|
-| **Vista** | **Un sensor:** una serie + KPIs (media, última, mín, máx, recuentos). **Todos numéricos:** varias series superpuestas (mismos sensores numéricos que `queries/master_query.sql`; sin binarios ni forecast texto). |
-| **Sensor** | Lista fija alineada con `queries/entity_ids_listed.sql` (ver `queries/grafana_entity_ids.sql`). En vista «Todos numéricos» el desplegable no cambia el gráfico; sí los KPIs cuando vuelves a «Un sensor». |
-| **Valores** | Numéricos por regex; contactos `on`/`off` como 0/1. |
+| **Variable "Sensor de temperatura"** | Solo **aula** (`sensor.sensor_temperatura_4_temperature`) y **exterior Mislata** (`sensor.mislata_temperatura`), alineado con `queries/master_query.sql`. Para ampliar la lista, edita la consulta de la variable en `dashboards/domotica-temperatura.json` (templating → `sensor`). |
+| **Paneles** | Serie temporal, KPIs (última, mín, máx, lecturas) y gauge de media en el rango de fechas. |
 
-Ajusta el rango temporal desde la UI (por defecto varios años hacia atrás).
+El dashboard trae por defecto el rango de mediciones del proyecto (**2024-12-18 18:06:21** → **2026-03-02 08:39:21**); puedes cambiarlo arriba a la derecha si hace falta.
 
 ## No se ven datos en los paneles
 

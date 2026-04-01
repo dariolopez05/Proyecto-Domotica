@@ -15,7 +15,7 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: admin1234
       GF_SECURITY_ADMIN_PASSWORD: admin1234
-      GF_USERS_DEFAULT_THEME: light
+      GF_USERS_DEFAULT_THEME: dark
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
       # Si .env tiene DB_HOST=localhost pero PostgreSQL está en el PC anfitrión, descomenta:
       DB_HOST: host.docker.internal
